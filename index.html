@@ -55,6 +55,7 @@
     var locationSelect;
 	var idcourse;
 	var dep = '';
+	var zip = '';
 	var time;
 	var endcourse; // Clears the timeout
 	var sec;
@@ -510,6 +511,7 @@
 						if (place.address_components[i].types[j] == "postal_code")
 						{
 							zip_code = place.address_components[i].long_name;
+							zip = zip_code;
 							//alert(zip_code);
 							var dep = zip_code.substring(0, 2);
 							$.sessionStorage.setItem('dep', dep);
@@ -604,9 +606,17 @@
 			{
 				if (results[0]) {
 						$('#addressInput').val(results[0].formatted_address);
-						var zip = component.long_name;
-						var dep = zip.substring(0, 2);
-						$.sessionStorage.setItem('dep', dep);
+					for(var i=0; i < results[0].address_components.length; i++)
+					{
+						var component = results[0].address_components[i];
+						if(component.types[0] == "postal_code")
+						{
+							//alert(component.long_name);
+							zip = component.long_name;
+							var dep = zip.substring(0, 2);
+							$.sessionStorage.setItem('dep', dep);
+						}
+					}
 				}
 				else {
 						alert('No results found');
@@ -654,7 +664,7 @@
 	function checkZip(pageToGo) {
 		var dep = $.sessionStorage.getItem('dep');
 		//alert(dep);
-		if (isPlaceChanged || (dep != '')) {
+		if (isPlaceChanged || (dep != '') || (zip != '')) {
 			$.mobile.pageContainer.pagecontainer("change", pageToGo, { transition: "slide", reverse: true} );
 		}
 		else {
@@ -663,8 +673,9 @@
 		}
 	}
 	function setZip() {
-		var zip = $('#zipDep').val();
-		$.sessionStorage.setItem('dep', zip);
+		zip = $('#zipDep').val();
+		var dep = zip.substring(0, 2);
+		$.sessionStorage.setItem('dep', dep);
 		$.mobile.pageContainer.pagecontainer("change", "#infos", { transition: "slide", reverse: true} );
 	}
 		
@@ -887,7 +898,7 @@
 		var dep = $.sessionStorage.getItem('dep');
 		i = 0; // We need to make any numreq unique on that one !!
 		//$.post("https://ssl14.ovh.net/~taxibleu/appserver/app_dcvp_xml.php", { lat: rdvlat, lng: rdvlng, type: typecar, howmany: howMany, cb: cb, group: '1', dep: '', pass: 'true'}, function(xml){
-		$.post('https://ssl14.ovh.net/~taxibleu/appserver/app_dcvp_xml.php', {lat: rdvlat, lng: rdvlng, type: typecar, howmany: howMany, cb: cb, group: group, dep: dep, pass: 'true'}, function(xml){
+		$.post('https://ssl14.ovh.net/~taxibleu/appserver/app_dcvp_xml.php', {lat: rdvlat, lng: rdvlng, type: typecar, howmany: howMany, cb: cb, group: group, dep: dep, zip: zip, pass: 'true'}, function(xml){
 			//alert('IN');
 			$(xml).find('marker').each(function(){
 				var name = $(this).attr('name');
@@ -1128,13 +1139,13 @@
  					<a href="#infos" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-icon-delete ui-btn-icon-notext ui-btn-right">Fermer</a>
                    <div data-theme="a" data-role="header">
                         <p style="font-size:21px;text-align:center;"><b>
-                            D&eacute;partement
+                            CP Commune
                         </b></p>
                     </div>
                     <div class="ui-content" role="main">
                     	<p>
-                            Veuillez saisir le num&eacute;ro du d&eacute;partement o&ugrave; vous vous trouvez :
-                            <input type="tel" id="zipDep" data-clear-btn="true" size="2"/>
+                            Veuillez saisir le code postal de la commune o&ugrave; vous vous trouvez :
+                            <input type="tel" id="zipDep" data-clear-btn="true" size="5"/>
                         </p>
                         <button class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check" onClick="setZip()">Envoyer</button>
                     </div>
