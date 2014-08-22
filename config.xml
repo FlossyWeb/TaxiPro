@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <widget xmlns = "http://www.w3.org/ns/widgets"
 		xmlns:gap = "http://phonegap.com/ns/1.0"
-		id = "com.taxibleuservices.taxipro"
+		id = "com.taxibleuservices.mytaxipro"
 		version = "1.0.1">
     
     <author href="http://flossyweb.com" email="contact@flossyweb.com">
         FRANCOIS-REGIS SIMON
     </author>
 
-	<name>Taxi Pro</name>
+	<name>MyTaxi Pro</name>
 
 	<description>
 	   Réservez votre taxi simplement via votre mobile avec l'application Taxi Pro.
 	</description>
 
-    <preference name="phonegap-version" value="3.3.0" />
+    <preference name="phonegap-version" value="3.5.0" />
     <preference name="orientation"      value="default" />
     <preference name="target-device"    value="universal" />
     <preference name="fullscreen"       value="false" />
