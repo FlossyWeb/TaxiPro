@@ -835,7 +835,7 @@
 					//self.get('map').setZoom(12);
 					//self.get('map').setCenter(myPlace);
 					self.addMarker({'position': myPlace, 'bounds': true, 'icon': userIcon }).click(function() {
-						self.openInfoWindow({ 'content': address+' / Lieu de prise en charge' }, this);
+						self.openInfoWindow({ 'content': '<p style="color:#333;">'+address+' / Lieu de prise en charge</p>' }, this);
 					});
 					//var gcenter = myPlace.lat().toFixed(4) +", "+ myPlace.lng().toFixed(4);
 					//var circleCenter = new google.maps.LatLng(gcenter);
@@ -1117,7 +1117,7 @@
 				var display_name = 'Taxi ' + name;
 				var cabIcon = 'visuels/cab_marker.png';
 				mapEvent.addMarker({ id: i ,'position': latlng, 'bounds': true, 'title': display_name, 'icon': cabIcon }).click(function() {
-					infoCont = "<b>Le taxi n&deg; " + name + " est &agrave; " + parseFloat(distance).toFixed(1) + " Km de vous</b><br>" + address;
+					infoCont = '<p style="color:#333;"><b>taxi n&deg; ' + name + ' est &agrave; ' + parseFloat(distance).toFixed(1) + ' Km de vous tel: ' + address+ '</b></p>';
 					mapEvent.openInfoWindow({ 'content':  infoCont}, this);
 				});
 				//mapEvent.addBounds(latlng);
@@ -1469,7 +1469,7 @@
     </div>
     <div data-role="page" data-theme="b" id="fleet_page" style="background: #000 url(visuels/bg.png) top left repeat-x;">
         <div data-role="header" data-position="fixed" data-fullscreen="true">
-            <a href="#homepanel" class="ui-btn ui-btn-icon-left ui-corner-all ui-shadow ui-icon-arrow-l"><p style="font-size:16px"><b>Menu</b></p></a>
+            <button onClick="goback('index.html')" class="ui-btn ui-btn-icon-left ui-corner-all ui-shadow ui-icon-power"><p style="font-size:16px"><b>Retour</b></p></button>
         </div>
         <div class="ui-content" id="fleet_map" role="main">
         </div>
