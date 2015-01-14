@@ -1158,7 +1158,7 @@
     function check_answer()
     {
 		dep = $.sessionStorage.getItem('dep');
-		$.post("https://www.mytaxiserver.com/appserver/status.php?idcourse=" + idcourse + "dep=" + dep + "&check=1" , {}, function(data){ 
+		$.post("https://www.mytaxiserver.com/appserver/status.php?idcourse=" + idcourse + "&dep=" + dep + "&check=1" , {}, function(data){ 
 			if (data != 0)
 			{
 				clearInterval(time);
