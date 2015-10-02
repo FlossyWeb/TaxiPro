@@ -165,8 +165,9 @@
 		setTimeout(function() {
 			//alert("received url: " + url);
 			fromApp = $.urlParam('from', url); // AppName
-			alert(fromApp);
-			if(fromApp=='driver') $('#getBackDriver').append('<a href="montaxidriver://" class="ui-btn ui-btn-icon-left ui-icon-back">Retour app chauffeur</a>');
+			if(fromApp=='driver') {
+				$('#getBackDriver').append('<a href="montaxidriver://" class="ui-btn ui-btn-c ui-btn-icon-left ui-icon-back">Retour app chauffeur</a>');
+			}
 		}, 600);
 	}
 	var scanSuccess = function (result) {
