@@ -165,8 +165,13 @@
 		setTimeout(function() {
 			//alert("received url: " + url);
 			fromApp = $.urlParam('from', url); // AppName
+			toApp = $.urlParam('to', url); // PageToGo
 			if(fromApp=='driver') {
-				$('#getBackDriver').append('<a href="montaxidriver://" class="ui-btn ui-btn-c ui-btn-icon-left ui-icon-back">Retour app chauffeur</a>');
+				$('#getBackDriver').append('<a href="montaxidriver://" class="ui-btn ui-btn-c ui-shadow ui-corner-all ui-btn-icon-left ui-icon-back">Retour app chauffeur</a>');
+			}
+			if(toApp=='history') {
+				alert(toApp);
+				$.mobile.pageContainer.pagecontainer("change", "#"+toApp, { transition: "slide"} );
 			}
 		}, 600);
 	}
