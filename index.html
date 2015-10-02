@@ -123,6 +123,14 @@
 				locateMe();
 			}, 1000);
 			scanner = cordova.require("cordova/plugin/BarcodeScanner");
+			// Get params from url when called from url the scheme...
+			function handleOpenURL(url) {
+				setTimeout(function() {
+					//alert("received url: " + url);
+					fromApp = $.urlParam('from'); // AppName
+					if(fromApp=='driver') $('#getBackDriver').append('<a href="montaxidriver://" class="ui-btn ui-btn-icon-left ui-icon-back">Retour app chauffeur</a>');
+				}, 600);
+			}
 		}
 		// GESTION DES BOUTONS MATERIEL
 		// Bouton retour
@@ -147,6 +155,18 @@
 				return "SI VOUS AVIEZ UNE COMMANDE EN COURS ELLE EST ANNULEE ! (CELA NE S'APPLIQUE PAS AUX RESERVATIONS)";
 			}
 		});
+	}
+	$.urlParam = function(name, url){
+		// Get parameters from an URL
+		var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(url);
+		//For current URL
+		//var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+		if (results==null){
+		   return null;
+		}
+		else{
+		   return results[1] || 0;
+		}
 	}
 	var scanSuccess = function (result) {
 		var textFormats = "QR_CODE DATA_MATRIX";
@@ -1379,6 +1399,7 @@
           <li><a href="#" onClick="goScan()" data-transition="slide" class="ui-btn ui-btn-icon-left ui-icon-camera noAppHide">Scanner un code</a></li>
         </ul>
         <button class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-power" onClick="dc()">D&eacute;connexion</button>
+		<div id="getBackDriver"></div>
     </div><!-- /panel -->
     <div data-role="page" data-theme="c"  id="infos">
         <div data-role="header" data-position="fixed" class="header">
@@ -1515,7 +1536,7 @@
     </div>
     <div data-role="page" data-theme="c" id="map_page" >
         <div class="ui-content" role="main" id="map">
-			<div data-role="popup" data-theme="c" id="answerBox" data-dismissible="false" data-position-to="window">
+			<div data-role="popup" data-theme="c" id="answerBox" data-dismissible="false" data-position-to="window" data-overlay-theme="b">
 				<div data-theme="c" data-role="header">
 					<h1>
 						Confirmation
@@ -1526,7 +1547,7 @@
 					<input type="button" value="OK" onClick="goback('index.html')"/>
 				</div>
 			</div>
-			<div data-role="popup" data-theme="c" id="backPop" data-dismissible="false">
+			<div data-role="popup" data-theme="c" id="backPop" data-dismissible="false" data-position-to="window" data-overlay-theme="b">
 				<div data-theme="c" data-role="header">
 					<h1>
 						Annulation
