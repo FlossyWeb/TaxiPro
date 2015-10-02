@@ -123,14 +123,6 @@
 				locateMe();
 			}, 1000);
 			scanner = cordova.require("cordova/plugin/BarcodeScanner");
-			// Get params from url when called from url the scheme...
-			function handleOpenURL(url) {
-				setTimeout(function() {
-					//alert("received url: " + url);
-					fromApp = $.urlParam('from'); // AppName
-					if(fromApp=='driver') $('#getBackDriver').append('<a href="montaxidriver://" class="ui-btn ui-btn-icon-left ui-icon-back">Retour app chauffeur</a>');
-				}, 600);
-			}
 		}
 		// GESTION DES BOUTONS MATERIEL
 		// Bouton retour
@@ -167,6 +159,14 @@
 		else{
 		   return results[1] || 0;
 		}
+	}
+	// Get params from url when called from url the scheme...
+	function handleOpenURL(url) {
+		setTimeout(function() {
+			alert("received url: " + url);
+			fromApp = $.urlParam('from'); // AppName
+			if(fromApp=='driver') $('#getBackDriver').append('<a href="montaxidriver://" class="ui-btn ui-btn-icon-left ui-icon-back">Retour app chauffeur</a>');
+		}, 600);
 	}
 	var scanSuccess = function (result) {
 		var textFormats = "QR_CODE DATA_MATRIX";
