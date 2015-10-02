@@ -163,8 +163,9 @@
 	// Get params from url when called from url the scheme...
 	function handleOpenURL(url) {
 		setTimeout(function() {
-			alert("received url: " + url);
-			fromApp = $.urlParam('from'); // AppName
+			//alert("received url: " + url);
+			fromApp = $.urlParam('from', url); // AppName
+			alert(fromApp);
 			if(fromApp=='driver') $('#getBackDriver').append('<a href="montaxidriver://" class="ui-btn ui-btn-icon-left ui-icon-back">Retour app chauffeur</a>');
 		}, 600);
 	}
