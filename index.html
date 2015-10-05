@@ -123,6 +123,9 @@
 				locateMe();
 			}, 1000);
 			scanner = cordova.require("cordova/plugin/BarcodeScanner");
+			cordova.plugins.notification.local.clearAll(function() {
+				//alert("All notifications cleared");
+			}, this);
 		}
 		// GESTION DES BOUTONS MATERIEL
 		// Bouton retour
@@ -170,7 +173,7 @@
 				$('#getBackDriver').append('<a href="montaxidriver://" class="ui-btn ui-btn-c ui-shadow ui-corner-all ui-btn-icon-left ui-icon-back">Retour app chauffeur</a>');
 			}
 			if(toApp=='history') {
-				alert(toApp);
+				//alert(toApp);
 				$.mobile.pageContainer.pagecontainer("change", "#"+toApp, { transition: "slide"} );
 			}
 		}, 600);
@@ -1346,6 +1349,16 @@
 				//$('#thanksResults').empty().append(data);
 				$('#answer').empty().append(data);
 				$( "#answerBox" ).popup( "open", { positionTo: "window" } );
+				var badgeNumber = 1;
+				var toNotify = data.split("<", 1);
+				cordova.plugins.notification.local.schedule({
+					id: 1,
+					title: "MonTaxi",
+					text: toNotify,
+					led: "E7B242",
+					badge: badgeNumber,
+					data: { data:data }
+				});
 			}
 		}).done(function(data) {
 			setTimeout('check_answer()', 2000);
