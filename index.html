@@ -986,6 +986,14 @@
 	$('#map_page').live('pagecreate', function() {
         endcourse = setTimeout( function () {
             $("#cancel").trigger('click');
+			badgeNumber = 1;
+			cordova.plugins.notification.local.schedule({
+				id: 1,
+				title: "MonTaxi",
+				text: "Aucun taxi n'a pris la course, veuillez réessayer SVP.",
+				led: "E7B242",
+				badge: badgeNumber
+			});
         }, 180000);
 		$('#map').gmap({'center': mobileMap.center, 'zoom': mobileMap.zoom, 'disableDefaultUI':false, 'mapTypeId': google.maps.MapTypeId.ROADMAP, 'callback': function() {
 			var self = this;
