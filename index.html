@@ -46,6 +46,7 @@
     <script src="barcodescanner.js"></script>
     <script src="contactNumberPicker.js"></script>
     <script src="sms.js"></script>
+    <script src="PowerManagement.js"></script>
     <script type="text/javascript" src="js/jquery.html5storage.min.js"></script>
     <script type="text/javascript" src="js/jsimple-star-rating.min.js"></script>
     <script type="text/javascript" src="js/jqm-datebox-1.4.5.min.js"></script>
@@ -80,6 +81,8 @@
 	var mobileMap = { 'center': '47.2, 2.5', 'zoom': 6 };
 	var isPlaceChanged = true; // Assuming geolocation will get zip unless address is tipped at last
 	var zipChecked = false;
+	var badgeNumber = 1;
+	var toNotify;
 
 	// Scanner
 	var scanner;
@@ -102,6 +105,8 @@
 			//document.addEventListener("menubutton", onMenuKeyDown, false);
 			StatusBar.overlaysWebView(false);
 			StatusBar.backgroundColorByHexString("#99808E");
+			// prevent device from sleeping
+			window.plugins.powerManagement.acquire();
 			if($.localStorage.getItem('registeredUser') != 1)
 			{
 				$.mobile.pageContainer.pagecontainer("change", "#connect", { transition: "slide"} );
@@ -123,6 +128,11 @@
 				locateMe();
 			}, 1000);
 			scanner = cordova.require("cordova/plugin/BarcodeScanner");
+			// Enable background mode
+			cordova.plugins.backgroundMode.enable();
+			cordova.plugins.backgroundMode.configure({
+				text:'App toujours en fonction, nous vous informons des courses en cours...'
+			});
 			cordova.plugins.notification.local.clearAll(function() {
 				//alert("All notifications cleared");
 			}, this);
@@ -1279,8 +1289,8 @@
 		num_req = idcourse;
 		dep = $.sessionStorage.getItem('dep');
 		i = 0; // We need to make any numreq unique on that one !!
-		//$.post("https://www.mytaxiserver.com/appserver/app_dcvp_xml.php", { lat: rdvlat, lng: rdvlng, type: typecar, howmany: howMany, cb: cb, group: '1', dep: '', pass: 'true'}, function(xml){
-		$.post('https://www.mytaxiserver.com/appserver/app_dcvp_xml.php', {lat: rdvlat, lng: rdvlng, type: typecar, howmany: howMany, cb: cb, group: group, dep: dep, zip: zip, pass: 'true'}, function(xml){
+		//$.post('https://www.mytaxiserver.com/appserver/app_dcvp_xml.php', {lat: rdvlat, lng: rdvlng, type: typecar, howmany: howMany, cb: cb, group: group, dep: dep, zip: zip, pass: 'true'}, function(xml){
+		$.post('http://www.mytaxiserver.com/appserver/app_dcvp_xml.php', {lat: rdvlat, lng: rdvlng, type: typecar, howmany: howMany, cb: cb, group: group, dep: dep, zip: zip, pass: 'true'}, function(xml){
 			//navigator.notification.alert('IN');
 			$(xml).find('marker').each(function(){
 				var name = $(this).attr('name');
@@ -1313,7 +1323,9 @@
 			// Sends Auction Request to TaxiMedia appserver
 			$('#dblinks').append($('<input class="cabs" id="' + i + '" type="hidden" onclick="sendJob(\''+ url +'\')" />'));
 			//$.post("https://www.mytaxiserver.com/appserver/diary_app_share.php", url, function(data) {});
-		}, "xml");
+		}, "xml").fail(function (jqXHR, textStatus, errorThrown) {
+				navigator.notification.alert('Erreur inconnue, le serveur ou la connexion internet sont indisponibles. ' + textStatus+', '+ errorThrown, alertDismissed, 'MonTaxi Erreur', 'OK');
+		});
 		$.mobile.loading( "hide" );
 		$('#dblinks').append($('<input id="stop" type="hidden" value="0" />'));
 		deliver();
@@ -1349,18 +1361,18 @@
 				//$('#thanksResults').empty().append(data);
 				$('#answer').empty().append(data);
 				$( "#answerBox" ).popup( "open", { positionTo: "window" } );
-				var badgeNumber = 1;
-				var toNotify = data.split("<", 1);
+				badgeNumber = 1;
+				toNotify = data.split("<", 1);
 				cordova.plugins.notification.local.schedule({
 					id: 1,
 					title: "MonTaxi",
 					text: toNotify,
 					led: "E7B242",
 					badge: badgeNumber,
-					data: { data:data }
+					data: { data:toNotify }
 				});
 			}
-		}).done(function(data) {
+		}).always(function(data) {
 			setTimeout('check_answer()', 2000);
 		});
     }
