@@ -1083,7 +1083,7 @@
 		$('#fleet_map').gmap({'center': mobileMap.center, 'zoom': mobileMap.zoom, 'disableDefaultUI':true, 'mapTypeId': google.maps.MapTypeId.ROADMAP, 'callback': function() {
 			var self = this;
 			dep = $.sessionStorage.getItem('dep');
-			$.post('https://www.mytaxiserver.com/appserver/station_fleet_xml.php?group=1&dep='+dep, function(xml){
+			$.post('http://www.mytaxiserver.com/appserver/station_fleet_xml.php?group=1&dep='+dep, function(xml){
 				$(xml).find('marker').each(function(){
 					var name = $(this).attr('name');
 					var address = $(this).attr('address');
