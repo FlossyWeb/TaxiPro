@@ -35,10 +35,10 @@
             $.mobile.allowCrossDomainPages = true;
             $.mobile.selectmenu.prototype.options.nativeMenu = false;
 			//$.mobile.ajaxEnabled = false;
-			$.mobile.loader.prototype.options.text = "Veuillez patienter pendant que nous effectuons votre recherche. Merci de votre confiance !";
+			$.mobile.loader.prototype.options.text = "Veuillez patienter pendant le chargement. Merci de votre confiance !";
 			$.mobile.loader.prototype.options.textVisible = "true";
 			$.mobile.loader.prototype.options.theme = "a";
-			$.mobile.loader.prototype.options.html = '<span class="ui-bar ui-overlay-a ui-corner-all"><center><img src="visuels/preload_world.gif"/><br><span style="color:#F00;">Veuillez patienter pendant que nous effectuons votre recherche.</span><br>Merci de votre confiance !</center></span>';
+			$.mobile.loader.prototype.options.html = '<span class="ui-bar ui-overlay-a ui-corner-all"><center><img src="visuels/preload.gif"/><br><span style="color:#F00;">Veuillez patienter pendant le chargement</span><br>Merci de votre confiance !</center></span>';
         });
     </script>    
     <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
@@ -63,6 +63,7 @@
 	var idcourse = '';
 	var dep = '';
 	var zip = '';
+	var insee = '';
 	var time;
 	var endcourse; // Clears the timeout
 	var regName1 = $.localStorage.getItem('regName1');
@@ -81,8 +82,14 @@
 	var mobileMap = { 'center': '47.2, 2.5', 'zoom': 6 };
 	var isPlaceChanged = true; // Assuming geolocation will get zip unless address is tipped at last
 	var zipChecked = false;
+	var hail_id = "";
+	var taxi_phone_number;
+	var lat = 0;
+	var lng = 0;
 	var badgeNumber = 1;
 	var toNotify;
+	var answerBoxOpenPoped=0;
+	var stopCheckAnswer=false;
 
 	// Scanner
 	var scanner;
@@ -128,11 +135,13 @@
 				locateMe();
 			}, 1000);
 			scanner = cordova.require("cordova/plugin/BarcodeScanner");
-			// Enable background mode
+			// For Android => Enable background mode
 			cordova.plugins.backgroundMode.enable();
 			cordova.plugins.backgroundMode.configure({
 				text:'App toujours en fonction, nous vous informons des courses en cours...'
 			});
+			// For iOS => backgroundtask
+			//backgroundtask.start(bgFunctionToRun);
 			cordova.plugins.notification.local.clearAll(function() {
 				//alert("All notifications cleared");
 			}, this);
@@ -148,6 +157,10 @@
 			if((navigator.network.connection.type == Connection.NONE) || !window.jQuery){
 				$("body").empty().append('<img src="no_network.png" width="'+screen.width+'" height="'+screen.height+'" onClick="window.location.reload()" />');
 			}
+		}
+		function bgFunctionToRun() {
+			if(hail_id!="") check_answer_open();
+			if(idcourse!="") check_answer();
 		}
 		// Bouton menu
 		//function onMenuKeyDown() {}
@@ -511,9 +524,22 @@
 		$.sessionStorage.setItem('rtel', rtel);
 		$.mobile.pageContainer.pagecontainer("change", "#rate_page", { transition: "slide"} );
 	}
+	function rateCabOpen(rtaxi, ridcourse, rdep, rtel, rhail_id, rrdv)
+	{ //\''.$taxi.'\', \''.$idcourse.'\', \''.$dep.'\', \''.$tel.'\', \''.$hail_id.'\', \''.$rdv.'\'
+		$.sessionStorage.setItem('rtaxi', rtaxi);
+		$.sessionStorage.setItem('rhail_id', rhail_id);
+		$.sessionStorage.setItem('rrdv', rrdv);
+		$.sessionStorage.setItem('ridcourse', ridcourse);
+		$.sessionStorage.setItem('rdep', rdep);
+		$.sessionStorage.setItem('rtel', rtel);
+		$('#monTaxiRate').hide();
+		$('#leTaxiRate').show();
+		$.mobile.pageContainer.pagecontainer("change", "#rate_page", { transition: "slide"} );
+	}
 	$( '#rate_page' ).live( 'pagecreate',function(event){
 		var noted = $.sessionStorage.getItem('rtaxi');
 		$('#urate').empty().append('Vous notez le taxi '+noted);
+		$('#urate2').empty().append('Vous notez le taxi '+noted);
 		$(".rating").starRating({
 			minus: false // step minus button
 		});
@@ -526,6 +552,17 @@
 		$(".rating4").starRating({
 			minus: false // step minus button
 		});
+		$(".rating5").starRating({
+			minus: false // step minus button
+		});
+		// For openRating there is a comment only if 3 stars or less
+		$('#leComRateCont').hide();
+		setInterval( function () {
+			//var fifthRate = $(".rating5").data("val");
+			var fifthRate = document.getElementById("rating5").getAttribute("data-val");
+			if (fifthRate < 4 && fifthRate != null) { $('#leComRateCont').show();}
+			else $('#leComRateCont').hide();
+		}, 1000);
 	});
 	function rating()
 	{
@@ -540,6 +577,19 @@
 		var comRate = $(".comRate").val();
 		//navigator.notification.alert(rtaxi+' - '+ridcourse+' - '+rdep+' - '+rtel+' - '+accueil+' - '+tarif+' - '+vehicule+' - '+conduite);
 		$.post("https://www.mytaxiserver.com/mytaxisrv/rate.php", { taxi: rtaxi, idcourse: ridcourse, dep: rdep, tel: rtel, accueil: accueil, tarif: tarif, vehicule: vehicule, conduite: conduite, comments: comRate, judge: 1}, function(data){ $('#rateBack').empty().append('Vos notes ont &eacute;t&eacute; prise en compte, Merci.');});
+	}
+	function ratingOpen()
+	{
+		var rhail_id = $.sessionStorage.getItem('rhail_id');
+		var rrdv = $.sessionStorage.getItem('rrdv');
+		var rtaxi = $.sessionStorage.getItem('rtaxi');
+		var ridcourse = $.sessionStorage.getItem('ridcourse');
+		var rdep = $.sessionStorage.getItem('rdep');
+		var rtel = $.sessionStorage.getItem('rtel');
+		var giveNote = $(".rating5").data("val");
+		var comRate = $("#leComRate").val();
+		//navigator.notification.alert(rtaxi+' - '+ridcourse+' - '+rdep+' - '+rtel+' - '+accueil+' - '+tarif+' - '+vehicule+' - '+conduite);
+		$.post("https://www.mytaxiserver.com/appclient/open_rate.php", { taxi: rtaxi, idcourse: ridcourse, dep: rdep, tel: rtel, hail_id: rhail_id, giveNote: giveNote, comments: comRate, cell: tel, operator: operator, rdv: rrdv, judge: 1}, function(data){ $('#leRateBack').empty().append('Vos note et commentaire ont &eacute;t&eacute; prise en compte, Merci.');});
 	}
 	function booking()
 	{
@@ -626,7 +676,7 @@
 			num_req = idcourse;
 			dep = $.sessionStorage.getItem('dep');
 			url = 'taxi=0000&tel=0000000000&idcourse=' + idcourse + '&num_req=' + num_req + '&rdvpoint=' + rdvpoint + '&lat=' + rdvlat + '&lng=' + rdvlng + '&comments=' + comments + '&cell=' + cell + '&when=' + when + '&date=' + date + '&operator=' + operator + '&howmany=' + howMany + '&dep='+dep + '&zip=' + zip+'&group=1&ack=0&db=1&prix=20000';
-			url = url.replace(/'/g, "&rsquo;");
+			//url = url.replace(/'/g, "&rsquo;"); // if we escape with &rsquo; it will break the url adding a new var &...
 			url = url.replace(/(?:\r\n|\r|\n)/g, '<br/>'); // Replaces line breaks by <br/>
 			$.post("https://www.mytaxiserver.com/appserver/bookings_app_share.php", url, function(data) {
 				if(!data.ok) {
@@ -715,9 +765,9 @@
 			else alert('Afin de modifier la réservation, vous devez renseigner une date de RDV !!');
 		}
 	}
-	function delCmd(id)
-	{		
-		$.post("https://www.mytaxiserver.com/appserver/bookings_app_mod.php", {idcourse: id, del: 1, db: 1}, function(data) {
+	function delCmd(id, deldep)
+	{
+		$.post("https://www.mytaxiserver.com/appserver/bookings_app_mod.php", {idcourse: id, dep: deldep, del: 1, db: 1}, function(data) {
 			if(!data.ok) {
 				if(app) navigator.notification.alert('Vous ne pouvez pas annuler cette réservation !!', alertDismissed, 'MonTaxi', 'OK');
 				else alert('Vous ne pouvez modifier la réservation !!');
@@ -811,7 +861,9 @@
 			});
 		}
 		once = true;
-        var ok = setInterval( function () {
+ 		// OpenData Areas Only... (#openDep-box)
+		$("#openDep-box").css("display", "none");
+       var ok = setInterval( function () {
             var name_filled = document.getElementById("Accurate").value;
             var cell_filled = document.getElementById("cellular").value;
 			var when = document.getElementById("when").value;
@@ -876,9 +928,40 @@
 		}
 	}
 	function codeLatLng(position) {
+		// Using http://adresse.data.gouv.fr
+		lat = position.coords.latitude;
+		lng = position.coords.longitude;
+		//http://api-adresse.data.gouv.fr/reverse/?lon=2.37&lat=48.357&type=street
+		$.get('http://api-adresse.data.gouv.fr/reverse/', {lat: lat, lon: lng, type: ''}, function(data) {
+			//alert(data.features[0].properties.label+' - '+data.features[0].properties.postcode);
+			if(data.features[0].properties.label!='baninfo') {
+				// Reverse geocoding is OK...
+				$('#addressInput').val(data.features[0].properties.label);
+				$('#addressInput2').val(data.features[0].properties.label);
+				insee = data.features[0].properties.citycode;
+				zip = data.features[0].properties.postcode;
+				dep = zip.substring(0, 2);
+				$.sessionStorage.setItem('dep', dep);
+			}
+			else {
+				if(app) navigator.notification.alert('Adresse inconnue !! Veuillez la saisir manuellement SVP.', alertDismissed, 'MonTaxi', 'OK');
+				else alert('Adresse inconnue !! Veuillez la saisir manuellement SVP.');
+			}
+		}, "json").done(function() { 
+			// OpenData Areas Only... (#openDep-box)
+			$.post("https://www.mytaxiserver.com/appclient/open_areas.php", { insee: insee, zip: zip, dep: dep}, function(data) {
+				if (data.go == "ok")
+				{
+					$("#openDep-box").show();
+					$("#search").text("Proposition automatique");
+				}
+			}, "json");
+		});
+	}
+	function codeLatLngGmaps(position) {
 		var geocoder = new google.maps.Geocoder();
-		var lat = position.coords.latitude;
-		var lng = position.coords.longitude;
+		lat = position.coords.latitude;
+		lng = position.coords.longitude;
 		var latlng = new google.maps.LatLng(lat, lng);
 		geocoder.geocode({'latLng': latlng}, function(results, status) {
 			if (status == google.maps.GeocoderStatus.OK)
@@ -905,7 +988,7 @@
 			}
 			else {
 				if(app) navigator.notification.alert('Geocoder failed due to: ' + status, alertDismissed, 'MonTaxi', 'OK');
-				else alert('Geocoder failed due to: ' + status);
+				else alert(geoAlert);
 			}
 		});
 	}
@@ -953,15 +1036,19 @@
 	}
 	function checkZip(pageToGo) {
 		$('#search').prop('disabled', true).addClass('ui-disabled'); // Prevents from multitap
+		$('#searchOpen').prop('disabled', true).addClass('ui-disabled'); // Prevents from multitap
 		dep = $.sessionStorage.getItem('dep');
 		if (isPlaceChanged || (dep != '') || (zip != '')) {
 			$.mobile.pageContainer.pagecontainer("change", pageToGo, { transition: "slide", reverse: true} );
 			$('#search').prop('disabled', false).removeClass('ui-disabled'); // Button is back
+			$('#searchOpen').prop('disabled', false).removeClass('ui-disabled'); // Button is back
 		}
 		else {
 			//navigator.notification.alert('No Zip Code Here !!');
+			$("#setZipBtn").attr("title", pageToGo); // Remembering pageToGo for setZip function, changing onClick attr is bad practice.
 			$( "#setZip" ).popup( "open", { positionTo: "window" } );
 			$('#search').prop('disabled', false).removeClass('ui-disabled'); // Button is back
+			$('#searchOpen').prop('disabled', false).removeClass('ui-disabled'); // Button is back
 		}
 	}
 	function setZip() {
@@ -978,6 +1065,74 @@
 			$.mobile.pageContainer.pagecontainer("change", "#map_page", { transition: "slide", reverse: true} );
 		}
 	}
+	$('#map_page_open').live('pagecreate', function() {
+		/*
+        endcourse = setTimeout( function () {
+            $("#cancel").trigger('click');
+        }, 180000);
+		*/
+		$('#map_open').gmap({'center': mobileMap.center, 'zoom': mobileMap.zoom, 'disableDefaultUI':false, 'mapTypeId': google.maps.MapTypeId.ROADMAP, 'callback': function() {
+			var self = this;
+			var geocoder = new google.maps.Geocoder();
+			var  address = $('#addressInput').val();
+			//var address = document.getElementById("addressInput").value;
+			geocoder.geocode({address: address}, function(results, status) {
+				if (status == google.maps.GeocoderStatus.OK) {
+					//$('#dblinks').append($('<p>' + results[0].geometry.location + '__RDV</p>'));
+					var myPlace = results[0].geometry.location;
+					$.mobile.loading( "show" );
+					for(var i=0; i < results[0].address_components.length; i++)
+					{
+						var component = results[0].address_components[i];
+						if(component.types[0] == "postal_code")
+						{
+							//navigator.notification.alert(component.long_name);
+							zip = component.long_name;
+							dep = zip.substring(0, 2);
+							$.sessionStorage.setItem('dep', dep);
+						}
+					}
+					//self.refresh();
+					wait4Me = setTimeout( function () {
+						searchLocationsNearOpen(myPlace, self);
+						//$.mobile.loading( "hide" );
+					}, 2000);
+					
+					var userIcon = 'visuels/client_loc_icon.png';
+					self.get('map').panTo(myPlace);
+					//self.get('map').setZoom(12);
+					//self.get('map').setCenter(myPlace);
+					self.addMarker({'position': myPlace, 'bounds': true, 'icon': userIcon }).click(function() {
+						self.openInfoWindow({ 'content': '<p style="color:#333;">'+address+' / Lieu de prise en charge</p>' }, this);
+					});
+					//var gcenter = myPlace.lat().toFixed(4) +", "+ myPlace.lng().toFixed(4);
+					//var circleCenter = new google.maps.LatLng(gcenter);
+					self.addShape('Circle', {
+						'strokeWeight': 0, 
+						'fillColor': "#008595", 
+						'fillOpacity': 0.25, 
+						'center': myPlace, 
+						'radius': 2000, 
+						'clickable': false 
+					});
+					
+					//searchLocationsNearOpen(myPlace, self);
+				} else {
+					if(app) navigator.notification.alert(address + ' NON TROUVEE ');
+					else alert(address + ' NON TROUVEE ');
+					$.mobile.pageContainer.pagecontainer("change", "#infos", { transition: "slide", reverse: true} );
+				}
+			});
+		}}); 
+	});
+	
+	$('#map_page_open').live('pageshow', function() {
+		//demo.add('basic_map', function() { $('#map').gmap('refresh'); }).load('basic_map');
+		//$('#map').gmap("option", "center", mobileMap.center);
+		$('#map_open').gmap('refresh');
+	});
+	////////////////////////////////////////////////////////////
+	
 	$( '#map_page' ).live( 'pagebeforeshow',function(event){
 		//$('#map').gmap('clear', 'markers');
 		//$('#dblinks').empty();	 
@@ -985,15 +1140,18 @@
 	
 	$('#map_page').live('pagecreate', function() {
         endcourse = setTimeout( function () {
-            $("#cancel").trigger('click');
-			badgeNumber = 1;
-			cordova.plugins.notification.local.schedule({
-				id: 1,
-				title: "MonTaxi",
-				text: "Aucun taxi n'a pris la course, veuillez réessayer SVP.",
-				led: "E7B242",
-				badge: badgeNumber
-			});
+			if(!stopCheckAnswer) {
+				$("#cancel").trigger('click');
+				badgeNumber = 1;
+				cordova.plugins.notification.local.schedule({
+					id: 1,
+					title: "MonTaxi",
+					text: "Aucun taxi n'a pris la course, veuillez réessayer SVP.",
+					led: "E7B242",
+					badge: badgeNumber
+				});
+				playAudio('sounds/ring.mp3');
+			}
         }, 180000);
 		$('#map').gmap({'center': mobileMap.center, 'zoom': mobileMap.zoom, 'disableDefaultUI':false, 'mapTypeId': google.maps.MapTypeId.ROADMAP, 'callback': function() {
 			var self = this;
@@ -1060,7 +1218,7 @@
 			time = setInterval( function () {
 				var stoper = document.getElementById('stop').value;
 				if (stoper != 1) {$('#dblinks #' + index).trigger('click');}
-				if ((index > 5) || (stoper == 1)) {
+				if ((index > 5) || (stoper == 1) || stopCheckAnswer) {
 					// THIS ONE IS THE 0000 CAB AND LAST ONE SO...
 					clearInterval(time); // Clears the current Interval
                     //clearTimeout(endcourse);
@@ -1109,6 +1267,117 @@
 	
 	$('#fleet_page').live('pageshow', function() {
 		$('#fleet_map').gmap('refresh');
+	});
+	////////////////////////////////////////////////////////////
+	
+	function followOpenCab(hailToFollow, frdv)
+	{
+		$.sessionStorage.setItem('hail_id', hailToFollow);
+		$.sessionStorage.setItem('frdv', frdv);
+		$.mobile.pageContainer.pagecontainer("change", "#follow_open", { transition: "slide"} );
+	}
+	$('#follow_open').live('pagecreate', function() {
+		hail_id = $.sessionStorage.getItem('hail_id');
+		var frdv = $.sessionStorage.getItem('frdv');
+		//alert(hail_id + " - " + frdv);
+		$('#follow_map_open').gmap({'center': mobileMap.center, 'zoom': mobileMap.zoom, 'disableDefaultUI':true, 'mapTypeId': google.maps.MapTypeId.ROADMAP, 'callback': function() {
+			var self = this;
+			navigator.geolocation.getCurrentPosition(function(position, status) {
+				var latlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+				lat = position.coords.latitude;
+				lng = position.coords.longitude;
+				self.get('map').panTo(latlng);
+				var userIcon = 'visuels/client_loc_icon.png';
+				self.addMarker({ id: 'you', 'position': latlng, 'bounds': true, 'icon': userIcon }).click(function() {
+					self.openInfoWindow({ 'content':  '<p style="color:#09F;"><b>Vous &Ecirc;tes ici</b></p>' }, this);
+				});
+				/*
+				self.addShape('Circle', {
+					'strokeWeight': 0, 
+					'fillColor': "#008595", 
+					'fillOpacity': 0.25, 
+					'center': latlng, 
+					'radius': 500, 
+					'clickable': true 
+				});
+				*/
+			}, showError,{enableHighAccuracy:true, maximumAge:0});
+			var geocoder = new google.maps.Geocoder();
+			var address = frdv;
+			geocoder.geocode({address: address}, function(results, status) {
+				if (status == google.maps.GeocoderStatus.OK) {
+					var rdvPlace = results[0].geometry.location;
+					//self.refresh();
+					var rdvIcon = 'visuels/rdv_marker.png';
+					self.get('map').panTo(rdvPlace);
+					//self.get('map').setZoom(12);
+					//self.get('map').setCenter(rdvPlace);
+					self.addMarker({'position': rdvPlace, 'bounds': true, 'icon': rdvIcon }).click(function() {
+						self.openInfoWindow({ 'content': '<p style="color:#6C0;"><b>Lieu de prise en charge</b></p>' }, this);
+					});
+					//var gcenter = rdvPlace.lat().toFixed(4) +", "+ rdvPlace.lng().toFixed(4);
+					//var circleCenter = new google.maps.LatLng(gcenter);
+					self.addShape('Circle', {
+						'strokeWeight': 0, 
+						'fillColor': "#008595", 
+						'fillOpacity': 0.25, 
+						'center': rdvPlace, 
+						'radius': 500, 
+						'clickable': true 
+					});
+				} else {
+					if(app) navigator.notification.alert('ADRESSE RDV : '+address+' NON TROUVEE ');
+					else alert('ADRESSE RDV : '+address+' NON TROUVEE ');
+				}
+			});
+			//$.post('https://www.mytaxiserver.com/appserver/open_follow.php', { hail_id: hail_id }, function(data){
+			$.post('http://www.mytaxiserver.com/appserver/open_follow.php', { hail_id: hail_id }, function(data){
+				var latlng = new google.maps.LatLng(data.lat, data.lng);
+				var display_name = 'Taxi ' + data.name;
+				var cabIcon = 'visuels/taxi_loc_icon.png';
+				self.addMarker({ id: 'cab', 'position': latlng, 'bounds': true, 'icon': cabIcon }).click(function() {
+					infoCont = '<p style="color:#333;"><b>Votre taxi joignable au: ' + data.address + '<br><span style="font-size: x-small;">(aclualis&eacute; &agrave; ' + data.timestamp+ ')</span></b></p>';
+					//infoCont = '<p style="color:#333;"><b>Votre taxi joignable au: <a data-ajax="false" href="tel:' + data.address + '" class="ui-btn ui-btn-c ui-corner-all ui-shadow ui-icon-phone ui-btn-icon-left">' + data.address + '</a><span style="font-size: x-small;">(aclualis&eacute; &agrave; ' + data.timestamp+ ')</span></b></p>';
+					//infoCont = '<p style="color:#333;"><b>Votre taxi joignable au: <a data-ajax="false" href="tel:' + data.address + '" class="ui-btn ui-btn-c ui-corner-all ui-shadow ui-icon-phone ui-btn-icon-left">' + data.address + '</a></b></p>';
+					self.openInfoWindow({ 'content':  infoCont}, this);
+				});
+				//alert(data.lat+', '+data.lng+' - '+data.name+' - '+data.address+' '+data.timestamp);
+			}, "json").fail(function (jqXHR, textStatus, errorThrown) {
+				navigator.notification.alert('Erreur inconnue, le serveur ou la connexion internet sont indisponibles. ' + textStatus+', '+ errorThrown, alertDismissed, 'MonTaxi Erreur', 'OK');
+			});
+			var track = setInterval( function () {
+				//$.post('https://www.mytaxiserver.com/appserver/open_follow.php', {  hail_id: hail_id }, function(data){
+				$.post('http://www.mytaxiserver.com/appserver/open_follow.php', {  hail_id: hail_id }, function(data){
+					//alert(data.lat+', '+data.lng+' - '+data.name+' - '+data.address+''+data.timestamp);
+					var markerCab = self.get('markers')['cab'];
+					markerCab.setVisible(false);
+					var latlng = new google.maps.LatLng(data.lat, data.lng);
+					var display_name = 'Taxi ' + data.name;
+					var cabIcon = 'visuels/taxi_loc_icon.png';
+					self.addMarker({ id: 'cab', 'position': latlng, 'bounds': true, 'icon': cabIcon }).click(function() {
+						infoCont = '<p style="color:#333;"><b>Votre taxi joignable au: <a data-ajax="false" href="tel:' + data.address + '" class="ui-btn ui-btn-c ui-corner-all ui-shadow ui-icon-phone ui-btn-icon-left">' + data.address + '</a><span style="font-size: x-small;">(aclualis&eacute; &agrave; ' + data.timestamp+ ')</span></b></p>';
+						//infoCont = '<p style="color:#333;"><b>Votre taxi joignable au: <a data-ajax="false" href="tel:' + data.address + '" class="ui-btn ui-btn-c ui-corner-all ui-shadow ui-icon-phone ui-btn-icon-left">' + data.address + '</a></b></p>';
+						self.openInfoWindow({ 'content':  infoCont}, this);
+					});
+					var markerYou = self.get('markers')['you'];
+					markerYou.setVisible(false);
+					navigator.geolocation.getCurrentPosition(function(position, status) {
+						var latlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude)
+						lat = position.coords.latitude;
+						lng = position.coords.longitude;
+						self.get('map').panTo(latlng);
+						var userIcon = 'visuels/client_loc_icon.png';
+						self.addMarker({ id: 'you', 'position': latlng, 'bounds': true, 'icon': userIcon }).click(function() {
+							self.openInfoWindow({ 'content':  '<p style="color:#09F;"><b>Vous &Ecirc;tes ici</b></p>' }, this);
+						});
+					}, showError,{enableHighAccuracy:true, maximumAge:0});
+				}, "json");
+			}, 10000);
+		}});
+	});
+	
+	$('#follow_open').live('pageshow', function() {
+		$('#follow_map_open').gmap('refresh');
 	});
 	////////////////////////////////////////////////////////////
 	
@@ -1215,6 +1484,131 @@
 	});
 	////////////////////////////////////////////////////////////
 	
+	function searchLocationsNearOpen(center, mapEvent) {
+		//clearLocations();
+		//navigator.notification.alert('In searchLocationsNearOpen');
+		$('#map_open').gmap('refresh');
+		var myDate = new Date();
+		idcourse = myDate.getTime();
+		//var radius = document.getElementById('radiusSelect').value;
+		var rdvpoint = document.getElementById("addressInput").value;
+		var room = document.getElementById("Accurate").value;
+		operator = $.localStorage.getItem('operator');
+		var hostname = document.getElementById("hostname").value;
+		var howMany = document.getElementById("howMany").value;
+		var typecar = document.getElementById("CarType").value;
+		var cb = document.getElementById("Pay").value;
+		var group = document.getElementById("group").value;
+		var payment = "Non";
+		if(cb == 1) {
+			payment = "Oui";
+		}
+		var coms = document.getElementById("coms").value.replace(/'/g, "&rsquo;");
+		var comments1 = '<ul><li>Nom du client : ' + room + '</li><li>Paiement CB : ' + payment + '</li><li>Nombre de passagers : ' + howMany + '</li><li>Type de vehicule : ' + typecar + '</li>';
+		if (coms != '') {
+			var comments2 = '<li>' + coms + '</li></ul>';
+		}
+		else {
+			var comments2 = '</ul>';
+		}
+		var comments = comments1+comments2;
+		var dest = document.getElementById("DestAddress").value;
+		var cell = document.getElementById("cellular").value;
+		var when = document.getElementById("when").value;
+		var date = document.getElementById("date").value;
+		//var medic = document.getElementById("medic").value;
+		if (!dontReg) {
+			for(n=1;n<4;n++) {
+				if(($.localStorage.getItem('regName'+n) == null) && ($.localStorage.getItem('regCell'+n) == null)) {
+					var regName = $.localStorage.setItem('regName'+n, $('#Accurate').val());
+					var regCell = $.localStorage.setItem('regCell'+n, cell);
+					var regLast = $.localStorage.setItem('regLast', n);
+					var writen = true;
+					break;
+				}
+			}
+			if(!writen) {
+				var regLast = $.localStorage.getItem('regLast');
+				switch (regLast) {
+					case '1':
+						var entry = 2;
+					  break;
+					case '2':
+						var entry = 3;
+					  break;
+					case '3':
+						var entry = 1;
+					  break;
+					default:
+				}
+				var regName = $.localStorage.setItem('regName'+entry, $('#Accurate').val());
+				var regCell = $.localStorage.setItem('regCell'+entry, cell);
+			}
+		}
+		var rdvlat = center.lat();
+		var rdvlng = center.lng();
+		//url = '';
+		num_req = idcourse;
+		dep = $.sessionStorage.getItem('dep');
+		//i = 0; // We need to make any numreq unique on that one !!
+		//$.post('https://www.mytaxiserver.com/appserver/open_app_dcvp_xml.php', {lat: rdvlat, lng: rdvlng, type: typecar, howmany: howMany, cb: cb, group: group, dep: dep, zip: zip, pass: 'true'}, function(xml){
+		$.post('http://www.mytaxiserver.com/appserver/open_app_dcvp_xml.php', {lat: rdvlat, lng: rdvlng, type: typecar, howmany: howMany, cb: cb, group: group, dep: dep, zip: zip, pass: 'true'}, function(xml){
+			//navigator.notification.alert('IN');
+			$(xml).find('marker').each(function(){
+				var cabid = $(this).attr('cabid');
+				var name = $(this).attr('name');
+				var appname = $(this).attr('appname');
+				var address = $(this).attr('address');
+				var lat2 = $(this).attr('lat');
+				var lng2 = $(this).attr('lng');
+				var timestamp = $(this).attr('timestamp');
+				var distance = $(this).attr('distance');
+				var i = $(this).attr('count');
+				//num_req = num_req+1;
+				var latlng = new google.maps.LatLng(lat2, lng2);
+				var display_name = 'Taxi ' + name;
+				var cabIcon = 'visuels/taxi_loc_icon.png';
+				var otherCabIcon = 'visuels/not_taxi_loc_icon.png';
+				var url = 'taxi=' + name + '&tel=' + address + '&cabid=' + cabid + '&idcourse=' + idcourse + '&num_req=' + num_req + '&rdvpoint=' + rdvpoint + '&lat=' + rdvlat + '&lng=' + rdvlng + '&comments=' + comments + '&cell=' + cell + '&when=' + when + '&date=' + date + '&operator=' + operator + '&appname=' + appname + '&dep='+dep+'&group=1&ack=0&db=1';
+				//url = 'rdvpoint=' + rdvpoint + '&operator=' + operator + '&lat=' + rdvlat + '&lng=' + rdvlng + '&cell=' + cell + '&appname=' + appname + '&cabid=' + cabid + '&dep='+dep+'&group=1&ack=0&db=1';
+				url = url.replace(/'/g, "&rsquo;");
+				url = url.replace(/(?:\r\n|\r|\n)/g, '<br/>'); // Replaces line breaks by <br/>
+				if(appname=="montaxi") {
+					mapEvent.addMarker({ id: 'favorite' ,'position': latlng, 'bounds': true, 'title': name, 'icon': cabIcon }).click(function() {
+						infoCont = '<div id="infoCont"><p style="color:#333;"><b>' + name + ' est &agrave; ' + parseFloat(distance).toFixed(1) + ' Km de vous.<br>' + address+ '</b></p></div>';
+						callBtn='<button class="ui-btn ui-corner-all ui-shadow ui-btn-c ui-btn-icon-left ui-icon-check cabs" id="' + i + '" onClick="sendJobOpen(\''+ url +'\')">Choisir</button>';
+						//mapEvent.openInfoWindow({ 'content':  infoCont}, this);
+						mapEvent.openInfoWindow({ 'content':  infoCont+callBtn}, this);
+					});
+				}
+				else {
+					mapEvent.addMarker({ id: i ,'position': latlng, 'bounds': true, 'title': name, 'icon': otherCabIcon }).click(function() {
+						infoCont = '<div id="infoCont"><p style="color:#333;"><b>' + name + ' est &agrave; ' + parseFloat(distance).toFixed(1) + ' Km de vous.<br>' + address+ '</b></p></div>';
+						callBtn='<button class="ui-btn ui-corner-all ui-shadow ui-btn-c ui-btn-icon-left ui-icon-check cabs" id="' + i + '" onClick="sendJobOpen(\''+ url +'\')">Choisir</button>';
+						//mapEvent.openInfoWindow({ 'content':  infoCont}, this);
+						mapEvent.openInfoWindow({ 'content':  infoCont+callBtn}, this);
+					});
+				}
+				//mapEvent.addBounds(latlng);
+				//$.post("https://www.mytaxiserver.com/appserver/diary_app_share.php", url, function(data) {});
+				//$('#dblinks').append($('<input class="cabs" id="' + i + '" type="hidden" onclick="sendJobOpen(\''+ url +'\')" />'));
+				//$('#dblinks').append($('<button class="ui-btn ui-corner-all ui-shadow ui-btn-c ui-btn-icon-left ui-icon-check cabs" id="' + i + '" onClick="sendJobOpen(\''+ url +'\')">Choisir</button>'));
+				//$('#infoCont').append($('<button class="ui-btn ui-corner-all ui-shadow ui-btn-c ui-btn-icon-left ui-icon-check cabs" id="' + i + '" onClick="sendJobOpen(\''+ url +'\')">Choisir</button>'));
+			});
+		}, "xml").done(function() { $.mobile.loading( "hide" ); });
+		setTimeout( function () {
+			var markerFav = mapEvent.get('markers')['favorite'];
+			markerFav.trigger('click');
+		}, 2000);
+		//$.mobile.loading( "hide" );
+		/*
+		if(i==0) {
+			if(app) navigator.notification.alert('Aucun taxis touvé', alertDismissed, 'MonTaxi', 'OK');
+			else alert('AUCUN TAXI TROUVE !!');
+			document.location.href='index.html';
+		}*/
+	}// ENDS FUNCTION
+
 	function searchLocationsNear(center, mapEvent) {
 		//clearLocations();
 		//navigator.notification.alert('In searchLocationsNear');
@@ -1348,6 +1742,98 @@
         }, 2000);
     }
 	
+    function sendJobOpen(url)
+    {
+		$.mobile.loading( "show" );
+		$('.cabs').prop('disabled', true).addClass('ui-disabled'); // Prevents from multitap
+		$('.confButtons').hide('fast');
+		$('.whatNext').hide('fast');
+		$('#answerOpen').empty().append('<p><b>Veuillez patienter pendant que nous traitons votre demande aupr&egrave;s du chauffeur ...<button type="button" class="cancel ui-btn ui-btn-b ui-shadow ui-corner-all ui-btn-icon-left ui-icon-delete" id="cancel" onClick="stopCallOpen()" value=""> Retour / Annulation </button></b></p>');
+		$.post("http://www.mytaxiserver.com/appserver/open_diary_app_share.php", url, function(data) {
+			hail_id = data.hail_id;
+			//taxi_phone_number = data.taxi_phone_number;
+		}, "json").done(function() { 
+			setTimeout('check_answer_open()', 500);
+			//check_answer_open();
+			$.mobile.loading( "hide" );
+		}).fail(function() { 
+			alert('Erreur !')
+			if(app) navigator.notification.alert("Erreur: La demande n'a pas été envoyée.", alertDismissed, 'MonTaxi', 'OK');
+			else alert("Erreur: La demande n'a pas été envoyée.");
+		});
+    }
+	
+    function check_answer_open()
+    {
+		//dep = $.sessionStorage.getItem('dep');
+		if(answerBoxOpenPoped==0) {
+			$( "#answerBoxOpen" ).popup( "open", { positionTo: "window" } );
+			answerBoxOpenPoped=1;
+		}
+		if(!stopCheckAnswer) {
+			$.post("https://www.mytaxiserver.com/appserver/open_status_json.php?hail_id=" + hail_id + "&dep=" + dep + "&check=1" , {}, function(data){ 
+				if (data.display != 0)
+				{
+					//clearInterval(time);
+					//clearTimeout(endcourse);
+					//cancel(idcourse);
+					//document.getElementById('stop').value = 1;
+					//var box = navigator.notification.alert(data.display);
+					//stopCallOpen();
+					//$('#thanksResults').empty().append(data.display);
+					$('#answerOpen').empty().append(data.display);
+					if(data.status == "accepted_by_taxi") {
+						$('.confButtons').show('fast');
+					}
+					else {
+						$('.whatNext').empty().append('<button onClick="refreshApp()" class="ui-btn ui-corner-all ui-shadow ui-btn-c ui-btn-icon-left ui-icon-home">Revenir &agrave; l&rsquo;accueil</button>');
+						$('.whatNext').show('fast');
+					}
+					//$( "#answerBoxOpen" ).popup( "open", { positionTo: "window" } );
+					badgeNumber = 1;
+					//toNotify = data.split("<", 1);
+					toNotify = data.display;
+					cordova.plugins.notification.local.schedule({
+						id: 1,
+						title: "MonTaxi",
+						text: toNotify,
+						led: "E7B242",
+						badge: badgeNumber,
+						data: { data:toNotify }
+					});
+					playAudio('sounds/ring.mp3');
+					//stopCheckAnswer=true;
+					//return false;
+				}
+			}, "json").always(function(data) {
+				setTimeout('check_answer_open()', 2000);
+			});
+		}
+    }
+
+    function cancelOpen(idcourse)
+    {
+		//navigator.notification.alert(idcourse);
+		dep = $.sessionStorage.getItem('dep');
+		if(hail_id!='') {
+			$.post("http://www.mytaxiserver.com/appserver/open_diary.php?hail_id=" + hail_id + "&ack=1&db=1&cab_wont=1&del=1&status=declined_by_customer"); 
+		}
+    }        
+	function stopCallOpen()
+	{
+		//$.mobile.loading( "show" );
+		//$('#dblinks').empty();
+		//clearInterval(time);
+		//clearTimeout(endcourse);
+		cancelOpen(idcourse);
+		//$('#map').gmap('destroy');
+		$('#map_open').gmap('destroy');
+		$( "#backPopOpen" ).popup( "open", { positionTo: "window" } );
+		var wait2getBack = setTimeout( function () {
+			document.location.href='index.html';
+			//$.mobile.pageContainer.pagecontainer("change", "#infos", { transition: "slide"} );
+		}, 2000);
+	}
     function sendJob(url)
     {	
 		$.post("https://www.mytaxiserver.com/appserver/diary_app_share.php", url, function(data) {});
@@ -1379,6 +1865,8 @@
 					badge: badgeNumber,
 					data: { data:toNotify }
 				});
+				playAudio('sounds/ring.mp3');
+				stopCheckAnswer=true;
 			}
 		}).always(function(data) {
 			setTimeout('check_answer()', 2000);
@@ -1416,10 +1904,95 @@
         document.location.href=flag;
 		//$.mobile.pageContainer.pagecontainer("change", "#infos", { transition: "slide"} );
     }        
-    function processMap()
+    function gobackOpen(flag, action)
     {
-        $.mobile.pageContainer.pagecontainer("change", "#map_page", { transition: "slide"} );
+		//$('#dblinks').empty();
+		idcourse=''; // reset idcourse
+		stopCheckAnswer=true;
+		answerBoxOpenPoped=0;
+		$('#answerOpen').empty().append('<p><b>Veuillez patienter un instant SVP</b></p>');
+		$('.confButtons').hide('fast');
+		if(action==1) {
+			// Client Agrees...
+			//$.post("https://www.mytaxiserver.com/appserver/open_diary.php?hail_id=" + hail_id + "&lat=" + lat + "&lng=" + lng + "&ack=1&db=1&cab_wont=0&del=0&status=accepted_by_customer").done(function(data) {
+			$.post("http://www.mytaxiserver.com/appserver/open_diary.php?hail_id=" + hail_id + "&lat=" + lat + "&lng=" + lng + "&cell=" + tel + "&operator=" + operator + "&dep=" + dep + "&ack=1&db=1&cab_wont=0&del=0&status=accepted_by_customer").done(function(data) {
+				//$('.whatNext').empty().append('<p><b>Vous avez accept&eacute; la course, le chauffeur se rend sur place, un mail vous a &eacute;t&eacute; envoy&eacute; et vous allez &ecirc;tre redirig&eacute; vers l&rsquo;accueil.</b></p>');
+				$('#answerOpen').empty().append('<p><b>Le chauffeur va maintenant vous rejoindre, voici les actions disponibles:</b></p>');
+				$('.whatNext').empty().append(data);
+				$('.whatNext').show('fast');
+				//stopCheckAnswer=false;
+				/*
+				setTimeout(function() { 
+					document.location.href=flag;
+				}, 6000);
+				*/
+			});
+		}
+		else {
+			// Client Abort...
+			//$.post("https://www.mytaxiserver.com/appserver/open_diary.php?hail_id=" + hail_id + "&lat=" + lat + "&lng=" + lng + "&ack=1&db=1&cab_wont=1&del=1&status=declined_by_customer").done(function(data) {
+			$.post("http://www.mytaxiserver.com/appserver/open_diary.php?hail_id=" + hail_id + "&lat=" + lat + "&lng=" + lng + "&cell=" + tel + "&operator=" + operator + "&dep=" + dep + "&ack=1&db=1&cab_wont=1&del=1&status=declined_by_customer").done(function(data) {
+				$('#answerOpen').empty();
+				$('.whatNext').empty().append('<p><b>Vous avez refus&eacute; la course et allez &ecirc;tre redirig&eacute; vers l&rsquo;accueil.</b></p>');
+				$('.whatNext').show('fast');
+				//stopCheckAnswer=false;
+				setTimeout(function() { 
+					document.location.href=flag;
+				}, 1000);
+			});
+		}
     }
+	function callIncident(irdv, ihail, iop, icell, istatus)
+	{ // callIncident(\''.$rdv.'\', \''.$hail_id.'\', \''.$operator.'\', \''.$cell.'\', \''.$status.'\')
+		$.post("https://www.mytaxiserver.com/appserver/open_incident.php" , { rdvpoint: irdv, hail_id: ihail, operator: iop, cell: icell, status: istatus, db: 'true'}, function(data){ 
+			if (data.ok)
+			{
+				var number = data.taxi_phone_number;
+				var message = "Suite à un incident, je ne pourrais vous attendre.";
+				var intent = ""; //leave empty for sending sms using default intent
+				var success = function () {
+				};
+				var error = function (e) {
+				};
+				sms.send(number, message, intent, success, error);
+				//$.mobile.pageContainer.pagecontainer("change", "#infos", { transition: "slide"} );
+				//return false;
+			}
+			else {
+				if(app) navigator.notification.alert("Erreur: L'incident n'a pas été déclaré.", alertDismissed, 'MonTaxi', 'OK');
+				else alert("Erreur: L'incident n'a pas été déclaré.");
+			}
+		}, "json");
+	}
+    function refreshApp()
+    {
+		document.location.href='index.html';
+    }
+	function playAudio(src) {
+		if (my_media == null) {
+			// Create Media object from src
+			var path = window.location.pathname;
+			path = path.substring(0, path.lastIndexOf('/') + 1);
+			var source = path + src;
+			my_media = new Media(source, playOnSuccess, playOnError);
+		}
+		// Play audio
+		my_media.play();
+	} 
+	// Stop audio
+	function stopAudio() {
+		if (my_media) {
+			my_media.stop();
+		}
+	}
+	// onSuccess Callback
+	function playOnSuccess() {
+		//console.log("playAudio():Audio Success");
+	}
+	// onError Callback 
+	function playOnError(error) {
+		//navigator.notification.alert('code: '    + error.code    + '\n' + 'message: ' + error.message + '\n');
+	}
 	/*
 	$('#infos').live("swiperight", function() {
 		$("#panel_poper").trigger('click');
@@ -1531,7 +2104,12 @@
                 <input type="hidden" id="radiusSelect" value="100" />
                 <p>&nbsp;</p>
                 <div id="next-box"><button id="next" class="ui-btn ui-btn-b ui-shadow ui-corner-all ui-btn-icon-left ui-icon-next">* Champs obligatoires</button></div>
-                <div id="search-box"><button onClick="checkZip('#map_page')" class="ui-btn ui-btn-c ui-shadow ui-corner-all ui-btn-icon-left ui-icon-search" id="search">Commander un taxi</button></div>
+                <div id="search-box">
+					<div id="openDep-box">
+						<button onClick="checkZip('#map_page_open')" class="ui-btn ui-btn-c ui-shadow ui-corner-all ui-btn-icon-left ui-icon-search" id="searchOpen">Choisir un taxi</button>
+					</div>
+					<button onClick="checkZip('#map_page')" class="ui-btn ui-btn-c ui-shadow ui-corner-all ui-btn-icon-left ui-icon-search" id="search">Commander un taxi</button>
+				</div>
                 <div id="book-box"><button onClick="booking()" class="ui-btn ui-btn-c ui-shadow ui-corner-all ui-btn-icon-left ui-icon-clock" id="booking">R&eacute;server un taxi</button></div>
                 <div data-role="popup" data-theme="a" id="errorPop" data-dismissible="true">
 					<a href="#infos" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-icon-delete ui-btn-icon-notext ui-btn-right">Fermer</a>
@@ -1574,6 +2152,42 @@
             </center>
         </div>
     </div>
+    <div data-role="page" data-theme="c" id="map_page_open">
+        <div class="ui-content" role="main" id="map_open">
+			<div data-role="popup" data-theme="c" id="answerBoxOpen" data-dismissible="false" data-position-to="window" data-overlay-theme="b">
+				<div data-theme="c" data-role="header">
+					<h1>
+						Confirmation
+					</h1>
+				</div>
+				<div class="ui-content" role="main">
+					<div id="answerOpen"></div>
+					<div class="confButtons">
+						<input type="button" value="ACCEPTER" onClick="gobackOpen('index.html', '1')"/>
+						<input type="button" value="REFUSER" onClick="gobackOpen('index.html', '0')"/>
+					</div>
+					<div class="whatNext"></div>
+				</div>
+			</div>
+			<div data-role="popup" data-theme="c" id="backPopOpen" data-dismissible="false" data-position-to="window" data-overlay-theme="b">
+				<div data-theme="c" data-role="header">
+					<h1>
+						Annulation
+					</h1>
+				</div>
+				<div class="ui-content" role="main">
+					<p><strong>
+						Vous avez annul&eacute; votre demande ou 
+						aucun taxis n&rsquo;a r&eacute;pondu dans le temps imparti, vous devriez rechercher de nouveau.
+					</strong></p>
+				</div>
+			</div>
+        </div>
+        <div data-role="footer" id="footer_map_open" data-position="fixed" data-fullscreen="true">
+			<p>Veuillez S&eacute;lectionner un des taxis ci-dessus et le choisir
+			<button type="button" class="cancel ui-btn ui-btn-b ui-shadow ui-corner-all ui-btn-icon-left ui-icon-delete" id="cancel" onClick="stopCallOpen()" value=""> Retour / Annulation </button></p>
+        </div>
+    </div>
     <div data-role="page" data-theme="c" id="map_page" >
         <div class="ui-content" role="main" id="map">
 			<div data-role="popup" data-theme="c" id="answerBox" data-dismissible="false" data-position-to="window" data-overlay-theme="b">
@@ -1609,8 +2223,8 @@
 				<div id="dblinks">
 				</div>
 			</div>
-			<p><strong>Veuillez patienter pendant la recherche et ne pas quitter l&rsquo;app SVP
-			<button type="button" class="cancel ui-btn ui-btn-b ui-shadow ui-corner-all ui-btn-icon-left ui-icon-delete" id="cancel" onClick="stopCall()" value=""> Retour / Annulation </button></strong></p>
+			<p>Veuillez patienter pendant la recherche et ne pas quitter l&rsquo;app SVP
+			<button type="button" class="cancel ui-btn ui-btn-b ui-shadow ui-corner-all ui-btn-icon-left ui-icon-delete" id="cancel" onClick="stopCall()" value=""> Retour / Annulation </button></p>
         </div>
     </div>
     <div data-role="page" data-theme="c" id="connect">
@@ -1760,6 +2374,16 @@
             </center>
         </div>
     </div>
+    <div data-role="page" data-theme="c" id="follow_open">
+        <div class="ui-content" id="follow_map_open" role="main">
+        </div>
+        <div data-role="footer" id="footer_map" data-position="fixed" data-fullscreen="true">
+            <center><p>
+                Les positions sont actualis&eacute;es toutes les 10 secondes.
+				<button onClick="goback('index.html')" class="ui-btn ui-btn-icon-left ui-corner-all ui-shadow ui-icon-power"><p style="font-size:16px"><b>Arr&ecirc;ter</b></p></button>
+            </p></center>
+        </div>
+    </div>
     <div data-role="page" data-theme="c" id="follow">
 		<!--
         <div data-role="header" data-position="fixed" data-fullscreen="true">
@@ -1792,9 +2416,9 @@
 			</table>
 		</div>
         <div class="ui-content" role="main">
-            <div style="display:block;">
+            <div style="display:block;" id="monTaxiRate">
             	<center>
-                <div id="urate" style="font-weight:bold;color: #FC0;"></div>
+					<div id="urate" style="font-weight:bold;color: #FC0;"></div>
                 </center>
                 <div class="ui-bar-a ui-corner-all ui-shadow" style="padding:1em; display:block;">
                     Accueil :
@@ -1809,6 +2433,28 @@
 				<textarea id="comRate" class="comRate" maxlength="512" placeholder="Commentaires"></textarea>
                 <center><div id="rateBack"></div></center>
                 <button class="ui-btn ui-corner-all ui-shadow ui-btn-c ui-btn-icon-left ui-icon-check" onClick="rating()">Envoyer</button>
+            </div>
+            <div style="display:block;" id="leTaxiRate">
+            	<center>
+					<div id="urate2" style="font-weight:bold;color: #FC0;"></div>
+                </center>
+                <div class="ui-bar-a ui-corner-all ui-shadow" style="padding:1em; display:block;">
+                    Note :
+                    <div class="rating5" id="rating5" data-rating-max="5"></div><div class="spacer"></div>
+                </div>
+				<div id="leComRateCont">
+					<!-- <textarea id="leComRate" class="leComRate" maxlength="512" placeholder="Commentaires"></textarea> -->
+					<select id="leComRate" class="leComRate"> 
+						<option value="" selected>Raisons possibles</option>
+						<option value="ko">Refus de service</option>
+						<option value="payment">Probl&egrave;me de paiement (moyen de paiement, rendu de monnaie...)</option>
+						<option value="cleanliness">Probl&egrave;me de propret&eacute; (v&eacute;hicule sale, odeur de tabac...)</option>
+						<option value="route">Probl&egrave;me de trajet (d&eacute;tours...)</option>
+						<option value="courtesy">Probl&egrave;me (politesse, radio, conduite...)</option>
+					</select>
+				</div>
+                <center><div id="leRateBack"></div></center>
+                <button class="ui-btn ui-corner-all ui-shadow ui-btn-c ui-btn-icon-left ui-icon-check" onClick="ratingOpen()">Envoyer</button>
             </div>
         </div>
     </div>
