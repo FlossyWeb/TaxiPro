@@ -3,7 +3,7 @@
     <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta http-equiv="CONTENT-LANGUAGE" content="French">
-    <title>MonTaxi Pro by TaxiMedia</title>
+    <title>Mon Appli Taxi Pro by TaxiMedia</title>
     <link rel="apple-touch-icon" href="visuels/idev.favicon.png"/>
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
     <!-- <meta name="viewport" content="width=device-width, height=device-height, user-scalable=yes, initial-scale=1"/> -->
@@ -151,7 +151,7 @@
 		function onBackKeyDown() {
 			//history.back();
 			//changePage('#infos');
-			navigator.notification.alert("Veuillez ne pas quitter monTaxi pendant la recheche de taxi disponibles", alertDismissed, 'MonTaxi', 'OK');
+			navigator.notification.alert("Veuillez ne pas quitter Mon Appli Taxi pendant la recheche de taxi disponibles", alertDismissed, 'Mon Appli Taxi', 'OK');
 		}
 		function onResume() {
 			if((navigator.network.connection.type == Connection.NONE) || !window.jQuery){
@@ -254,7 +254,7 @@
 			setTimeout(function(){
 				//navigator.notification.alert(result.name + " " + result.phoneNumber);
 				var number = result.phoneNumber;
-				var message = "Téléchargez l'app monTaxi Pro en suivant ce lien : http://www.taximedia.fr/stores.php?app=taxipro";
+				var message = "Téléchargez l'app Mon Appli Taxi Pro en suivant ce lien : http://www.taximedia.fr/stores.php?app=taxipro";
 				var intent = ""; //leave empty for sending sms using default intent
 				var smsSuccess = function () {
 					//navigator.notification.alert('Message sent successfully');
@@ -683,7 +683,7 @@
 					//alert('Vous ne pouvez reserver un taxi que si le RDV est dans plus de 60 minutes !!');
 					//Sending as direct job
 					if(data.past) {
-						if(app) navigator.notification.alert('LA DATE DU RDV EST PASSEE !!', alertDismissed, 'MonTaxi', 'OK');
+						if(app) navigator.notification.alert('LA DATE DU RDV EST PASSEE !!', alertDismissed, 'Mon Appli Taxi', 'OK');
 						else alert('LA DATE DU RDV EST PASSEE !!');
 					}
 					else {
@@ -761,7 +761,7 @@
 			}, "json");
 		}
 		else {
-			if(app) navigator.notification.alert('Afin de modifier la réservation, vous devez renseigner une date de RDV !!', alertDismissed, 'MonTaxi', 'OK');
+			if(app) navigator.notification.alert('Afin de modifier la réservation, vous devez renseigner une date de RDV !!', alertDismissed, 'Mon Appli Taxi', 'OK');
 			else alert('Afin de modifier la réservation, vous devez renseigner une date de RDV !!');
 		}
 	}
@@ -769,11 +769,11 @@
 	{
 		$.post("https://www.mytaxiserver.com/appserver/bookings_app_mod.php", {idcourse: id, dep: deldep, del: 1, db: 1}, function(data) {
 			if(!data.ok) {
-				if(app) navigator.notification.alert('Vous ne pouvez pas annuler cette réservation !!', alertDismissed, 'MonTaxi', 'OK');
+				if(app) navigator.notification.alert('Vous ne pouvez pas annuler cette réservation !!', alertDismissed, 'Mon Appli Taxi', 'OK');
 				else alert('Vous ne pouvez modifier la réservation !!');
 			}
 			else {
-				if(app) navigator.notification.alert('La réservation à bien été annulée !!', alertDismissed, 'MonTaxi', 'OK');
+				if(app) navigator.notification.alert('La réservation à bien été annulée !!', alertDismissed, 'Mon Appli Taxi', 'OK');
 				else alert('La réservation à bien été annulée !!');
 			}
 		}, "json");
@@ -892,8 +892,8 @@
             }
 			if(howMany>8) {
 				if(once) {
-					if(app) navigator.notification.alert('Pour plus de huit personnes veuillez passer une réservation SVP', alertDismissed, 'MonTaxi', 'OK');
-					else alert('Pour plus de huit personnes veuillez passer une réservation SVP', alertDismissed, 'MonTaxi', 'OK');
+					if(app) navigator.notification.alert('Pour plus de huit personnes veuillez passer une réservation SVP', alertDismissed, 'Mon Appli Taxi', 'OK');
+					else alert('Pour plus de huit personnes veuillez passer une réservation SVP', alertDismissed, 'Mon Appli Taxi', 'OK');
 					$('#book').slideToggle('slow');
 					$('#date').focus();
 				}
@@ -944,7 +944,7 @@
 				$.sessionStorage.setItem('dep', dep);
 			}
 			else {
-				if(app) navigator.notification.alert('Adresse inconnue !! Veuillez la saisir manuellement SVP.', alertDismissed, 'MonTaxi', 'OK');
+				if(app) navigator.notification.alert('Adresse inconnue !! Veuillez la saisir manuellement SVP.', alertDismissed, 'Mon Appli Taxi', 'OK');
 				else alert('Adresse inconnue !! Veuillez la saisir manuellement SVP.');
 			}
 		}, "json").done(function() { 
@@ -982,12 +982,12 @@
 					}
 				}
 				else {
-					if(app) navigator.notification.alert('Adresse inconnue !!', alertDismissed, 'MonTaxi', 'OK');
+					if(app) navigator.notification.alert('Adresse inconnue !!', alertDismissed, 'Mon Appli Taxi', 'OK');
 					else alert('Adresse inconnue !!');
 				}
 			}
 			else {
-				if(app) navigator.notification.alert('Geocoder failed due to: ' + status, alertDismissed, 'MonTaxi', 'OK');
+				if(app) navigator.notification.alert('Geocoder failed due to: ' + status, alertDismissed, 'Mon Appli Taxi', 'OK');
 				else alert(geoAlert);
 			}
 		});
@@ -1021,7 +1021,7 @@
 		// Fall back to no options and try again for Android to work.
 		navigator.geolocation.getCurrentPosition(codeLatLng, function(){
 			//$( "#errorPop" ).popup( "open", { positionTo: "window" } );
-			if(app) navigator.notification.alert(geoAlert, alertDismissed, 'MonTaxi', 'OK');
+			if(app) navigator.notification.alert(geoAlert, alertDismissed, 'Mon Appli Taxi', 'OK');
 			else alert(geoAlert);
 		});
 	}			  
@@ -1145,7 +1145,7 @@
 				badgeNumber = 1;
 				cordova.plugins.notification.local.schedule({
 					id: 1,
-					title: "MonTaxi",
+					title: "Mon Appli Taxi",
 					text: "Aucun taxi n'a pris la course, veuillez réessayer SVP.",
 					led: "E7B242",
 					badge: badgeNumber
@@ -1200,7 +1200,7 @@
 					
 					//searchLocationsNear(myPlace, self);
 				} else {
-					if(app) navigator.notification.alert(address + ' NON TROUVEE ', alertDismissed, 'MonTaxi', 'OK');
+					if(app) navigator.notification.alert(address + ' NON TROUVEE ', alertDismissed, 'Mon Appli Taxi', 'OK');
 					else alert(address + ' NON TROUVEE ');
 					$.mobile.pageContainer.pagecontainer("change", "#infos", { transition: "slide", reverse: true} );
 				}
@@ -1343,7 +1343,7 @@
 				});
 				//alert(data.lat+', '+data.lng+' - '+data.name+' - '+data.address+' '+data.timestamp);
 			}, "json").fail(function (jqXHR, textStatus, errorThrown) {
-				navigator.notification.alert('Erreur inconnue, le serveur ou la connexion internet sont indisponibles. ' + textStatus+', '+ errorThrown, alertDismissed, 'MonTaxi Erreur', 'OK');
+				navigator.notification.alert('Erreur inconnue, le serveur ou la connexion internet sont indisponibles. ' + textStatus+', '+ errorThrown, alertDismissed, 'Mon Appli Taxi Erreur', 'OK');
 			});
 			var track = setInterval( function () {
 				//$.post('https://www.mytaxiserver.com/appserver/open_follow.php', {  hail_id: hail_id }, function(data){
@@ -1432,7 +1432,7 @@
 						'clickable': true 
 					});
 				} else {
-					if(app) navigator.notification.alert('ADRESSE RDV : '+address+' NON TROUVEE ', alertDismissed, 'MonTaxi', 'OK');
+					if(app) navigator.notification.alert('ADRESSE RDV : '+address+' NON TROUVEE ', alertDismissed, 'Mon Appli Taxi', 'OK');
 					else alert('ADRESSE RDV : '+address+' NON TROUVEE ');
 				}
 			});
@@ -1447,7 +1447,7 @@
 					});
 				}
 				else {
-					if(app) navigator.notification.alert('Vous ne pouvez suivre un taxi que 30 minutes avant le RDV !!', alertDismissed, 'MonTaxi', 'OK');
+					if(app) navigator.notification.alert('Vous ne pouvez suivre un taxi que 30 minutes avant le RDV !!', alertDismissed, 'Mon Appli Taxi', 'OK');
 					else alert('Vous ne pouvez suivre un taxi que 30 minutes avant le RDV !!');
 					//document.location.href='index.html';
 					$.mobile.pageContainer.pagecontainer("change", "#history", { transition: "slide"} );
@@ -1603,7 +1603,7 @@
 		//$.mobile.loading( "hide" );
 		/*
 		if(i==0) {
-			if(app) navigator.notification.alert('Aucun taxis touvé', alertDismissed, 'MonTaxi', 'OK');
+			if(app) navigator.notification.alert('Aucun taxis touvé', alertDismissed, 'Mon Appli Taxi', 'OK');
 			else alert('AUCUN TAXI TROUVE !!');
 			document.location.href='index.html';
 		}*/
@@ -1726,7 +1726,7 @@
 			$('#dblinks').append($('<input class="cabs" id="' + i + '" type="hidden" onclick="sendJob(\''+ url +'\')" />'));
 			//$.post("https://www.mytaxiserver.com/appserver/diary_app_share.php", url, function(data) {});
 		}, "xml").fail(function (jqXHR, textStatus, errorThrown) {
-				navigator.notification.alert('Erreur inconnue, le serveur ou la connexion internet sont indisponibles. ' + textStatus+', '+ errorThrown, alertDismissed, 'MonTaxi Erreur', 'OK');
+				navigator.notification.alert('Erreur inconnue, le serveur ou la connexion internet sont indisponibles. ' + textStatus+', '+ errorThrown, alertDismissed, 'Mon Appli Taxi Erreur', 'OK');
 		});
 		$.mobile.loading( "hide" );
 		$('#dblinks').append($('<input id="stop" type="hidden" value="0" />'));
@@ -1758,7 +1758,7 @@
 			$.mobile.loading( "hide" );
 		}).fail(function() { 
 			alert('Erreur !')
-			if(app) navigator.notification.alert("Erreur: La demande n'a pas été envoyée.", alertDismissed, 'MonTaxi', 'OK');
+			if(app) navigator.notification.alert("Erreur: La demande n'a pas été envoyée.", alertDismissed, 'Mon Appli Taxi', 'OK');
 			else alert("Erreur: La demande n'a pas été envoyée.");
 		});
     }
@@ -1795,7 +1795,7 @@
 					toNotify = data.display;
 					cordova.plugins.notification.local.schedule({
 						id: 1,
-						title: "MonTaxi",
+						title: "Mon Appli Taxi",
 						text: toNotify,
 						led: "E7B242",
 						badge: badgeNumber,
@@ -1859,7 +1859,7 @@
 				toNotify = data.split("<", 1);
 				cordova.plugins.notification.local.schedule({
 					id: 1,
-					title: "MonTaxi",
+					title: "Mon Appli Taxi",
 					text: toNotify,
 					led: "E7B242",
 					badge: badgeNumber,
@@ -1959,7 +1959,7 @@
 				//return false;
 			}
 			else {
-				if(app) navigator.notification.alert("Erreur: L'incident n'a pas été déclaré.", alertDismissed, 'MonTaxi', 'OK');
+				if(app) navigator.notification.alert("Erreur: L'incident n'a pas été déclaré.", alertDismissed, 'Mon Appli Taxi', 'OK');
 				else alert("Erreur: L'incident n'a pas été déclaré.");
 			}
 		}, "json");
@@ -2353,7 +2353,7 @@
         <div class="ui-content" role="main">
             <div class="ui-bar-b ui-corner-all ui-shadow" style="padding:1em; display:block;">
             	<center>
-                <p><b><br><br>Votre demande a &eacute;t&eacute; prise en compte, votre taxi prendra contact avec vous par t&eacute;l&eacute;phone ou sms.<br><br>Toute l&rsquo;&eacute;quipe monTaxi vous remercie.</b></p>
+                <p><b><br><br>Votre demande a &eacute;t&eacute; prise en compte, votre taxi prendra contact avec vous par t&eacute;l&eacute;phone ou sms.<br><br>Toute l&rsquo;&eacute;quipe Mon Appli Taxi vous remercie.</b></p>
                 <button class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-back" onClick="goback('index.html')">Retour</button>
                 </center>
             </div>
