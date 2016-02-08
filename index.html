@@ -1551,6 +1551,7 @@
 		num_req = idcourse;
 		dep = $.sessionStorage.getItem('dep');
 		//i = 0; // We need to make any numreq unique on that one !!
+		var openAvail = false;
 		//$.post('https://www.mytaxiserver.com/appserver/open_app_dcvp_xml.php', {lat: rdvlat, lng: rdvlng, type: typecar, howmany: howMany, cb: cb, group: group, dep: dep, zip: zip, pass: 'true'}, function(xml){
 		$.post('http://www.mytaxiserver.com/appserver/open_app_dcvp_xml.php', {lat: rdvlat, lng: rdvlng, type: typecar, howmany: howMany, cb: cb, group: group, dep: dep, zip: zip, pass: 'true'}, function(xml){
 			//navigator.notification.alert('IN');
@@ -1589,17 +1590,29 @@
 						mapEvent.openInfoWindow({ 'content':  infoCont+callBtn}, this);
 					});
 				}
+				openAvail = true; // There is at least one available cab here
 				//mapEvent.addBounds(latlng);
 				//$.post("https://www.mytaxiserver.com/appserver/diary_app_share.php", url, function(data) {});
 				//$('#dblinks').append($('<input class="cabs" id="' + i + '" type="hidden" onclick="sendJobOpen(\''+ url +'\')" />'));
 				//$('#dblinks').append($('<button class="ui-btn ui-corner-all ui-shadow ui-btn-c ui-btn-icon-left ui-icon-check cabs" id="' + i + '" onClick="sendJobOpen(\''+ url +'\')">Choisir</button>'));
 				//$('#infoCont').append($('<button class="ui-btn ui-corner-all ui-shadow ui-btn-c ui-btn-icon-left ui-icon-check cabs" id="' + i + '" onClick="sendJobOpen(\''+ url +'\')">Choisir</button>'));
 			});
+			if(!openAvail) {
+				if(app) navigator.notification.alert("Aucun taxis trouvé à proximité dans ce mode.\nVous allez être redirigé vers le script de recherche automatique.", alertDismissed, 'Mon Appli Taxi', 'OK');
+				else alert("Aucun taxis trouvé à proximité dans ce mode.\nVous allez être redirigé vers le script de recherche automatique.");
+				idcourse=''; // reset idcourse
+				$('#map_open').gmap('destroy');
+				setTimeout( function () {
+					$.mobile.pageContainer.pagecontainer("change", "#map_page", { transition: "slide"} );
+				}, 1000);
+			}
 		}, "xml").done(function() { $.mobile.loading( "hide" ); });
-		setTimeout( function () {
-			var markerFav = mapEvent.get('markers')['favorite'];
-			markerFav.trigger('click');
-		}, 2000);
+		if(openAvail) {
+			setTimeout( function () {
+				var markerFav = mapEvent.get('markers')['favorite'];
+				markerFav.trigger('click');
+			}, 2000);
+		}
 		//$.mobile.loading( "hide" );
 		/*
 		if(i==0) {
