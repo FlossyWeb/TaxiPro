@@ -135,13 +135,18 @@
 				locateMe();
 			}, 1000);
 			scanner = cordova.require("cordova/plugin/BarcodeScanner");
+			/*
 			// For Android => Enable background mode
 			cordova.plugins.backgroundMode.enable();
 			cordova.plugins.backgroundMode.configure({
 				text:'App toujours en fonction, nous vous informons des courses en cours...'
 			});
+			*/
 			// For iOS => backgroundtask
-			//backgroundtask.start(bgFunctionToRun);
+			backgroundtask.start(bgFunctionToRun);
+			cordova.plugins.notification.local.clearAll(function() {
+				//alert("All notifications cleared");
+			}, this);
 			cordova.plugins.notification.local.clearAll(function() {
 				//alert("All notifications cleared");
 			}, this);
