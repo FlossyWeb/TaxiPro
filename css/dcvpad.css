@@ -220,3 +220,61 @@ input[type=text], input[type=tel], input[type=date], input[type=time] {
 .rating > ul > li.hover, .rating2 > ul > li.hover, .rating3 > ul > li.hover, .rating4 > ul > li.hover, .rating5 > ul > li.hover { background-position: -25px; }
 .rating > ul > li.active, .rating2 > ul > li.active, .rating3 > ul > li.active, .rating4 > ul > li.active, .rating5 > ul > li.active { background-position: -50px; }
 .rating > span.less, .rating2 > span.less, .rating3 > span.less, .rating4 > span.less, .rating5 > span.less { cursor: pointer; background: url(../visuels/star-rating.gif) -75px no-repeat; display: block; float: right; height: 25px; width: 25px;}
+/* NYC & Wifi Anims ---------------------------- */
+.nyc {
+	width: 100%; height: 100%;
+	min-width: 100%; min-height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+	overflow: auto;
+	background: url(../visuels/taxi-bg-bk-bw.jpg) no-repeat center fixed; 
+	background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	-webkit-background-size: cover;
+}
+.nyc .wifiSteps {
+	max-width: 512px;
+	position: fixed;
+	left: 0; right: 0;
+	margin-left: auto; margin-right: auto;
+	z-index: 1000;
+}
+.nyc p {
+	font-size: 1.6em;
+	line-height: 1;
+	color: #FFF;
+	text-shadow: 2px 2px 2px #333;
+	text-align: right;
+	position: absolute;
+	z-index: 9999;
+}
+.nyc p.bottomText {
+	bottom: 26%;
+	right: 0;
+}
+@media all and (orientation: landscape) { 
+	.nyc {
+		background: url(../visuels/taxi-bg-ny.jpg) no-repeat center fixed; 
+		background-size: cover;
+		-moz-background-size: cover;
+		-o-background-size: cover;
+		-webkit-background-size: cover;
+	}
+	.nyc .wifiSteps {
+		max-width: 512px;
+		position: absolute;
+		bottom: 6%;
+		left: 6%; right: 94%;
+		z-index: 1000;
+	}
+}
+.headerBook {
+	display: none;
+}
+@media all and (min-height: 800px) and (orientation: landscape) {
+	.headerBook {
+		display: block;
+	}
+}
