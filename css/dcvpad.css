@@ -272,9 +272,13 @@ input[type=text], input[type=tel], input[type=date], input[type=time] {
 }
 .headerBook {
 	display: none;
+	z-index: 9999;
+	position: absolute;
+	top: 0;
+	left:0;
 }
-@media all and (min-height: 800px) and (orientation: landscape) {
+@media all and (min-height: 800px) and (orientation: landscape) , all and (orientation: portrait) {
 	.headerBook {
-		display: block;
+		display: table;
 	}
 }

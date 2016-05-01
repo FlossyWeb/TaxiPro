@@ -895,6 +895,7 @@
 			else {
 				if(app) navigator.notification.alert('La réservation à bien été annulée !!', alertDismissed, 'Mon Appli Taxi', 'OK');
 				else alert('La réservation à bien été annulée !!');
+				refreshHist();
 			}
 		}, "json");
 	}
@@ -2763,12 +2764,16 @@
         </div>
     </div>
     <div data-role="page" data-theme="c" id="book_page">
+		<!--
         <div data-role="header" data-position="fixed" class="header headerBook">
-			<table width="100%" border="0" class="header_cont">
+		</div>
+		-->
+        <div class="ui-content" role="main">
+			<table width="100%" border="0" class="headerBook">
 				<thead><tr><th width="50%"></th><th width="34%"></th><th width="16%"></th></tr></thead>
 				<tbody>
 				<tr><td>
-					<img src="visuels/header.png" width="100%" style="max-width:512px;"/>
+					<img src="visuels/header.png" width="100%" style="max-width:500px;"/>
 				</td><td>
 					<p>&nbsp;</p>
 				</td><td align="center">
@@ -2778,8 +2783,6 @@
 				</td></tr>
 				</tbody>
 			</table>
-		</div>
-        <div class="ui-content" role="main">
 			<div id="animBook" class="nyc">
 				<p class="bottomText"><b>
 					<br><br>Votre demande a &eacute;t&eacute; prise en compte, votre taxi prendra contact avec vous par t&eacute;l&eacute;phone ou sms.<br><br>Toute l&rsquo;&eacute;quipe Mon Appli Taxi vous remercie.
