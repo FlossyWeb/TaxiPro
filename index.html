@@ -545,7 +545,7 @@
 	function openSomeUrl(url)
 	{
 		//window.plugins.childBrowser.showWebPage('http://www.taximedia.fr/redir.php', { showLocationBar: true });
-		window.open(url,'_blank','location=false,enableViewportScale=yes,closebuttoncaption=Fermer');
+		window.open(url,'_blank','location=false,enableViewportScale=yes,scrollbars=yes,closebuttoncaption=Fermer');
 	}
 	$(document).on( 'pagecreate', function() {
 		$( "body>[data-role='panel']" ).panel().enhanceWithin();
@@ -788,7 +788,7 @@
 						else alert('LA DATE DU RDV EST PASSEE !!');
 					}
 					else {
-						checkZip('#map_page');
+						checkZip('#map_page_open');
 					}
 				}
 				else {
@@ -1941,7 +1941,7 @@
 				var distance = $(this).attr('distance');
 				i = $(this).attr('count');
 				num_req = num_req+1;
-				url = 'taxi=' + name + '&tel=' + address + '&idcourse=' + idcourse + '&num_req=' + num_req + '&rdvpoint=' + rdvpoint + '&lat=' + rdvlat + '&lng=' + rdvlng + '&comments=' + comments + '&cell=' + cell + '&when=' + when + '&date=' + date + '&operator=' + operator + '&dep='+dep+'&group=1&ack=0&db=1';
+				url = 'taxi=' + name + '&tel=' + address + '&idcourse=' + idcourse + '&num_req=' + num_req + '&rdvpoint=' + rdvpoint + '&lat=' + rdvlat + '&lng=' + rdvlng + '&comments=' + comments + '&cell=' + cell + '&when=' + when + '&date=' + date + '&operator=' + operator + '&dep='+dep+'&group=1&ack=0&db=1&prix=20000';
 				url = url.replace(/'/g, "&rsquo;");
 				url = url.replace(/(?:\r\n|\r|\n)/g, '<br/>'); // Replaces line breaks by <br/>
 				//$.post("https://www.mytaxiserver.com/appserver/diary_app_share.php", url, function(data) {});
@@ -1949,7 +1949,7 @@
 			});
 			num_req = num_req+1;
 			i = parseInt(i,10)+1;
-			url = 'taxi=0000&tel=0000000000&idcourse=' + idcourse + '&num_req=' + num_req + '&rdvpoint=' + rdvpoint + '&lat=' + rdvlat + '&lng=' + rdvlng + '&comments=' + comments + '&cell=' + cell + '&when=' + when + '&date=' + date + '&operator=' + operator + '&dep='+dep+'&group=1&ack=0&db=1';
+			url = 'taxi=0000&tel=0000000000&idcourse=' + idcourse + '&num_req=' + num_req + '&rdvpoint=' + rdvpoint + '&lat=' + rdvlat + '&lng=' + rdvlng + '&comments=' + comments + '&cell=' + cell + '&when=' + when + '&date=' + date + '&operator=' + operator + '&dep='+dep+'&group=1&ack=0&db=1&prix=20000';
 			//navigator.notification.alert(url);
 			url = url.replace(/'/g, "&rsquo;");
 			url = url.replace(/(?:\r\n|\r|\n)/g, '<br/>'); // Replaces line breaks by <br/>
@@ -2322,6 +2322,7 @@
 	{
 		var rdvPrices = $('#addressInputPrices').val();
 		var destPrices = $('#DestAddressPrices').val();
+		$('#addressInput').val(rdvPrices); // regarding the command button.
 		var rdvPricesLng;
 		var rdvPricesLat;
 		var destPricesLng;
@@ -2337,10 +2338,10 @@
 					destPricesLng = data.features[0].geometry.coordinates[0];
 					destPricesLat = data.features[0].geometry.coordinates[1];
 				}, "json").done(function(data) { 
-					var devUrl = 'lat=' + rdvPricesLat + '&lng=' + rdvPricesLng + '&lat2=' + destPricesLat + '&lng2=' + destPricesLng + '&dep=' + dep+ '&app=1';
+					var devUrl = 'lat=' + rdvPricesLat + '&lng=' + rdvPricesLng + '&lat2=' + destPricesLat + '&lng2=' + destPricesLng + '&rdv=' + rdvPrices + '&dest=' + destPrices + '&dep=' + dep+ '&app=1';
 					//alert(devUrl);
 					$.post("http://www.mytaxiserver.com/appserver/calcdev.php", devUrl, function(data) { 
-						$('#pricesCont').empty().append(data);
+						$('#pricesCont').empty().append(data+'<button onClick="checkZip(\'#map_page_open\')" class="ui-btn ui-btn-c ui-shadow ui-corner-all ui-btn-icon-left ui-icon-action" id="search">Commander maintenant</button>');
 						//$('#pricesPopCont').empty().append(data);
 						//$( "#pricesPop" ).popup( "open", { positionTo: "window" } );
 					});
@@ -2392,10 +2393,10 @@
     <div data-role="panel" id="homepanel" data-position="right" data-display="reveal">
         <!-- panel content goes here -->
         <ul data-role="listview" data-inset="true" data-theme="c">
-          <li><a href="#infos" class="ui-btn ui-btn-icon-left ui-icon-home"><b>Accueil</b></a></li>
-          <li><a href="#history" class="ui-btn ui-btn-icon-left ui-icon-bars">Historique</a></li>
-          <li><a href="#account" class="ui-btn ui-btn-icon-left ui-icon-user">Mon compte</a></li>
+          <li><a href="#infos" class="ui-btn ui-btn-icon-left ui-icon-home" data-transition="slide"><b>Commander</b></a></li>
           <li><a href="#prices" class="ui-btn ui-btn-icon-left ui-icon-info" data-transition="slide"><b>Tarification</b></a></li>
+          <li><a href="#history" class="ui-btn ui-btn-icon-left ui-icon-bars" data-transition="slide">Historique</a></li>
+          <li><a href="#account" class="ui-btn ui-btn-icon-left ui-icon-user" data-transition="slide">Mon compte</a></li>
           <!-- 
           <li><a href="#fleet_page" class="ui-btn ui-btn-icon-left ui-icon-eye">Taxis disponibles</a></li>
 		  <li><a href="#" onClick="Share()" class="ui-btn ui-btn-icon-left ui-icon-mail noAppHide"><b>Partager l&rsquo;app</b></a></li>
@@ -2459,7 +2460,7 @@
                     </tbody>
                 </table>
                 <!-- <p style="font-size:small;"><em>*</em> Ces informations sont obligatoires</p> -->
-                <p class="expends"><b>Des d&eacute;tails ?</b><br><img src="visuels/dots.png" width="100%" style="max-width:1200px;"/></p>
+                <p class="expends"><b>Un besoin particulier ?</b><br><img src="visuels/dots.png" width="100%" style="max-width:1200px;"/></p>
                 <div id="details">
                     <label for="howMany">Nombre de passagers :</label>
                     <input name="howMany" id="howMany" min="1" max="20" value="1" data-theme="c" data-show-value="true" data-popup-enabled="true" type="range">
