@@ -1302,9 +1302,10 @@
 					
 					//searchLocationsNearOpen(myPlace, self);
 				} else {
-					if(app) navigator.notification.alert(address + ' NON TROUVEE ');
-					else alert(address + ' NON TROUVEE ');
-					$.mobile.pageContainer.pagecontainer("change", "#infos", { transition: "slide", reverse: true} );
+					if(app) navigator.notification.alert(address + ' ADRESSE NON TROUVEE !');
+					else alert(address + ' ADRESSE NON TROUVEE !');
+					//$.mobile.pageContainer.pagecontainer("change", "#infos", { transition: "slide", reverse: true} );
+					refreshApp();
 				}
 			});
 		}}); 
@@ -1804,12 +1805,13 @@
 				url = url.replace(/'/g, "&rsquo;");
 				url = url.replace(/(?:\r\n|\r|\n)/g, '<br/>'); // Replaces line breaks by <br/>
 				if(appname=="montaxi") {
-					mapEvent.addMarker({ id: 'favorite' ,'position': latlng, 'bounds': true, 'title': name, 'icon': cabIcon }).click(function() {
+					var mymarker = mapEvent.addMarker({ id: 'favorite' ,'position': latlng, 'bounds': true, 'title': name, 'icon': cabIcon }).click(function() {
 						infoCont = '<div id="infoCont"><p style="color:#333;"><b>' + name + ' est &agrave; ' + parseFloat(distance).toFixed(1) + ' Km de vous.<br>' + address+ '</b></p></div>';
 						callBtn='<button class="ui-btn ui-corner-all ui-shadow ui-btn-c ui-btn-icon-left ui-icon-check cabs" id="' + i + '" onClick="sendJobOpen(\''+ url +'\')">Choisir</button>';
 						//mapEvent.openInfoWindow({ 'content':  infoCont}, this);
 						mapEvent.openInfoWindow({ 'content':  infoCont+callBtn}, this);
 					});
+					new google.maps.event.trigger(mymarker[0],'click');
 				}
 				else {
 					mapEvent.addMarker({ id: i ,'position': latlng, 'bounds': true, 'title': name, 'icon': otherCabIcon }).click(function() {
@@ -1827,15 +1829,24 @@
 				//$('#infoCont').append($('<button class="ui-btn ui-corner-all ui-shadow ui-btn-c ui-btn-icon-left ui-icon-check cabs" id="' + i + '" onClick="sendJobOpen(\''+ url +'\')">Choisir</button>'));
 			});
 			if(!openAvail) {
-				if(app) navigator.notification.alert("Aucun taxis trouvé à proximité dans ce mode.\nVous allez être redirigé vers le script de recherche automatique.", alertDismissed, 'Mon Appli Taxi', 'OK');
-				else alert("Aucun taxis trouvé à proximité dans ce mode.\nVous allez être redirigé vers le script de recherche automatique.");
-				idcourse=''; // reset idcourse
-				$('#map_open').gmap('destroy');
-				setTimeout( function () {
-					$.mobile.pageContainer.pagecontainer("change", "#map_page", { transition: "slide"} );
-				}, 1000);
+				// special_need_vehicle needs the opendata...
+				if ($('#Pmr').val()=='special_need_vehicle') {
+					if(app) navigator.notification.alert('Vous ne pouvez obtenir de transport pour personne à mobilité réduite (TPMR)car, il semblerait qu\'aucun vehicule de ce type ne se trouve dans cette zone, désolé.', alertDismissed, 'Mon Appli Taxi', 'OK');
+					else alert('Vous ne pouvez obtenir de transport pour personne à mobilité réduite (TPMR)car, il semblerait qu\'aucun vehicule de ce type ne se trouve dans cette zone, désolé.');
+					$.mobile.pageContainer.pagecontainer("change", "#infos", { transition: "slide"} );
+				}
+				else {
+					if(app) navigator.notification.alert("Aucun taxis trouvé à proximité dans ce mode.\nVous allez être redirigé vers le script de recherche automatique.", alertDismissed, 'Mon Appli Taxi', 'OK');
+					else alert("Aucun taxis trouvé à proximité dans ce mode.\nVous allez être redirigé vers le script de recherche automatique.");
+					idcourse=''; // reset idcourse
+					$('#map_open').gmap('destroy');
+					setTimeout( function () {
+						$.mobile.pageContainer.pagecontainer("change", "#map_page", { transition: "slide"} );
+					}, 1000);
+				}
 			}
 		}, "xml").done(function() { $.mobile.loading( "hide" ); });
+		/*
 		if(openAvail) {
 			setTimeout( function () {
 				var markerFav = mapEvent.get('markers')['favorite'];
@@ -1843,7 +1854,6 @@
 			}, 2000);
 		}
 		//$.mobile.loading( "hide" );
-		/*
 		if(i==0) {
 			if(app) navigator.notification.alert('Aucun taxis touvé', alertDismissed, 'Mon Appli Taxi', 'OK');
 			else alert('AUCUN TAXI TROUVE !!');
@@ -1865,6 +1875,9 @@
 		var typecar = document.getElementById("CarType").value;
 		var cb = document.getElementById("Pay").value;
 		var group = document.getElementById("group").value;
+		var pet = document.getElementById("Pet").value;
+		var pets = 'Non';
+		if(pet=='pet_accepted') pets = 'Oui';
 		switch (cb) {
 			case '0':
 				var payment = "Non";
@@ -1883,7 +1896,7 @@
 				cb = 0;
 		}
 		var coms = document.getElementById("coms").value;
-		var comments1 = '<ul>' + company + '<li>Nom du client : ' + room + '</li><li>Paiement CB : ' + payment + '</li><li>Nombre de passagers : ' + howMany + '</li><li>Type de vehicule : ' + typecar + '</li>';
+		var comments1 = '<ul>' + company + '<li>Nom du client : ' + room + '</li><li>Paiement CB : ' + payment + '</li><li>Nombre de passagers : ' + howMany + '</li><li>Type de vehicule : ' + typecar + '</li><li>Animaux : ' + pets + '</li>';
 		if (coms != '') {
 			var comments2 = '<li>' + coms + '</li></ul>';
 		}
