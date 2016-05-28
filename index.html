@@ -92,6 +92,8 @@
 	var answerBoxOpenPoped=0;
 	var stopCheckAnswer=false;
 	var refreshOpenMarkers;
+	var markerCab;
+	var countMarkerCab;
 
 	// Scanner
 	var scanner;
@@ -1211,12 +1213,12 @@
 			  geoAlert="Erreur de Géolocalisation, libre à vous d'activer le service de géolocalisation pour cette app dans les réglages.";
 		}
 		if (error.code == error.TIMEOUT) {
-			// Fall back to low accuracy and try again...
+			// Fall back to low accuracy and any cached position available...
 			navigator.geolocation.getCurrentPosition(codeLatLng, function(){
 				//$( "#errorPop" ).popup( "open", { positionTo: "window" } );
 				if(app) navigator.notification.alert(geoAlert, alertDismissed, 'Mon Appli Taxi', 'OK');
 				else alert(geoAlert);
-			},{enableHighAccuracy:false, maximumAge:'infinity', timeout: 6000});
+			},{enableHighAccuracy:false, maximumAge:Infinity, timeout: 6000});
 		}
 		else {
 			//$( "#errorPop" ).popup( "open", { positionTo: "window" } );
@@ -1597,7 +1599,7 @@
 				//$.post('https://www.mytaxiserver.com/appserver/open_follow.php', {  hail_id: hail_id }, function(data){
 				$.post('http://www.mytaxiserver.com/appserver/open_follow.php', {  hail_id: hail_id }, function(data){
 					//alert(data.lat+', '+data.lng+' - '+data.name+' - '+data.address+''+data.timestamp);
-					var markerCab = self.get('markers')['cab'];
+					markerCab = self.get('markers')['cab'];
 					markerCab.setVisible(false);
 					var latlng = new google.maps.LatLng(data.lat, data.lng);
 					var display_name = 'Taxi ' + data.name;
@@ -1703,7 +1705,7 @@
 			}, "json");
 			var track = setInterval( function () {
 				$.post('https://www.mytaxiserver.com/appserver/follow.php', { taxi: ftaxi, idcourse: fidcourse, dep: fdep, tel: ftel, table: ftable }, function(data){
-					var markerCab = self.get('markers')['cab'];
+					markerCab = self.get('markers')['cab'];
 					markerCab.setVisible(false);
 					var latlng = new google.maps.LatLng(data.lat, data.lng);
 					var display_name = 'Taxi ' + data.name;
@@ -1723,7 +1725,7 @@
 						});
 					}, showError,{enableHighAccuracy:true, maximumAge:0});
 				}, "json");
-			}, 30000); 
+			}, 10000); 
 		}});
 	});
 	
@@ -1846,6 +1848,7 @@
 					});
 				}
 				openAvail = true; // There is at least one available cab here
+				countMarkerCab = i;
 				//mapEvent.addBounds(latlng);
 				//$.post("https://www.mytaxiserver.com/appserver/diary_app_share.php", url, function(data) {});
 				//$('#dblinks').append($('<input class="cabs" id="' + i + '" type="hidden" onclick="sendJobOpen(\''+ url +'\')" />'));
@@ -1873,8 +1876,8 @@
 		refreshOpenMarkers = setInterval( function () {
 			openAvail = false;
 			once = true; // we only trigger the first marker
-			for(k=0;k<10;k++) {
-				var markerCab = mapEvent.get('markers')[k];
+			for(k=0;k<=countMarkerCab;k++) {
+				markerCab = mapEvent.get('markers')[k];
 				markerCab.setVisible(false);
 			}
 			$.post('http://www.mytaxiserver.com/appserver/open_app_dcvp_xml.php', {lat: rdvlat, lng: rdvlng, type: typecar, howmany: howMany, cb: cb, pmr: pmr, pet: pet, group: group, dep: dep, zip: zip, pass: 'true'}, function(xml){
@@ -1919,6 +1922,7 @@
 						});
 					}
 					openAvail = true; // There is at least one available cab here
+					countMarkerCab = i;
 					//mapEvent.addBounds(latlng);
 					//$.post("https://www.mytaxiserver.com/appserver/diary_app_share.php", url, function(data) {});
 					//$('#dblinks').append($('<input class="cabs" id="' + i + '" type="hidden" onclick="sendJobOpen(\''+ url +'\')" />'));
