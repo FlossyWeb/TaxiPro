@@ -2243,7 +2243,14 @@
 			answerBoxOpenPoped=1;
 		}
 		if(!stopCheckAnswer) {
-			$.post("http://www.mytaxiserver.com/appserver/open_status_json.php?hail_id=" + hail_id + "&dep=" + dep + "&check=1" , {}, function(data){ 
+			$.ajax({
+				type: "GET",
+				url: "http://www.mytaxiserver.com/appserver/open_status_json.php?hail_id=" + hail_id + "&dep=" + dep + "&check=1",
+				data: { hail_id: hail_id, dep: dep, check: 1 },
+				dataType: "json",
+				cache: false,
+				timeout: 2000 // in milliseconds
+			}).done(function(data) {
 				if (data.display != 0)
 				{
 					//clearInterval(time);
@@ -2277,8 +2284,8 @@
 					//stopCheckAnswer=true;
 					//return false;
 				}
-			}, "json").always(function(data) {
-				setTimeout('check_answer_open()', 2000);
+			}).always(function(data) {
+				setTimeout('check_answer_open()', 1000);
 			});
 		}
     }
@@ -2316,7 +2323,14 @@
     {
 		dep = $.sessionStorage.getItem('dep');
 		if(!stopCheckAnswer) {
-			$.post("http://www.mytaxiserver.com/appserver/status.php?idcourse=" + idcourse + "&dep=" + dep + "&check=1" , {}, function(data){ 
+			$.ajax({
+				type: "GET",
+				url: "http://www.mytaxiserver.com/appserver/open_status_json.php?hail_id=" + hail_id + "&dep=" + dep + "&check=1",
+				data: { idcourse: idcourse, dep: dep, check: 1 },
+				dataType: "html",
+				cache: false,
+				timeout: 2000 // in milliseconds
+			}).done(function(data) {
 				if (data != 0)
 				{
 					clearInterval(time);
@@ -2342,9 +2356,10 @@
 					});
 					playAudio('sounds/ring.mp3');
 					stopCheckAnswer=true;
+					//return false;
 				}
 			}).always(function(data) {
-				setTimeout('check_answer()', 2000);
+				setTimeout('check_answer()', 1000);
 			});
 		}
     }
