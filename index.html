@@ -94,6 +94,7 @@
 	var refreshOpenMarkers;
 	var markerCab;
 	var countMarkerCab;
+	var notifyOnce = true;
 
 	// Scanner
 	var scanner;
@@ -2260,27 +2261,33 @@
 					//$('#thanksResults').empty().append(data.display);
 					$('#answerOpen').empty().append(data.display);
 					if(data.status == "accepted_by_taxi") {
-						$('.confButtons').show('fast');
+						if(!stopCheckAnswer) $('.confButtons').show('fast'); // Avoid to show it twice as first if(!stopCheckAnswer) event is before the AJAX call and here is after completion
 					}
 					else {
 						$('.whatNext').empty().append('<button onClick="refreshApp()" class="ui-btn ui-corner-all ui-shadow ui-btn-c ui-btn-icon-left ui-icon-home">Revenir &agrave; l&rsquo;accueil</button>');
 						$('.whatNext').show('fast');
 					}
 					//$( "#answerBoxOpen" ).popup( "open", { positionTo: "window" } );
-					badgeNumber = 1;
-					//toNotify = data.split("<", 1);
-					toNotify = data.display;
-					cordova.plugins.notification.local.schedule({
-						id: 1,
-						title: "Mon Appli Taxi",
-						text: toNotify,
-						led: "E7B242",
-						badge: badgeNumber,
-						data: { data:toNotify }
-					});
-					playAudio('sounds/ring.mp3');
+					if(notifyOnce) {
+						notifyOnce = false;
+						badgeNumber = 1;
+						//toNotify = data.split("<", 1);
+						toNotify = data.display;
+						cordova.plugins.notification.local.schedule({
+							id: 1,
+							title: "Mon Appli Taxi",
+							text: toNotify,
+							led: "E7B242",
+							badge: badgeNumber,
+							data: { data:toNotify }
+						});
+						playAudio('sounds/ring.mp3');
+					}
 					//stopCheckAnswer=true;
 					//return false;
+				}
+				else {
+					notifyOnce = true;
 				}
 			}).always(function(data) {
 				setTimeout('check_answer_open()', 1000);
@@ -2342,19 +2349,25 @@
 					//$('#thanksResults').empty().append(data);
 					$('#answer').empty().append(data);
 					$( "#answerBox" ).popup( "open", { positionTo: "window" } );
-					badgeNumber = 1;
-					toNotify = data.split("<", 1);
-					cordova.plugins.notification.local.schedule({
-						id: 1,
-						title: "Mon Appli Taxi",
-						text: toNotify,
-						led: "E7B242",
-						badge: badgeNumber,
-						data: { data:toNotify }
-					});
-					playAudio('sounds/ring.mp3');
+					if(notifyOnce) {
+						notifyOnce = false;
+						badgeNumber = 1;
+						toNotify = data.split("<", 1);
+						cordova.plugins.notification.local.schedule({
+							id: 1,
+							title: "Mon Appli Taxi",
+							text: toNotify,
+							led: "E7B242",
+							badge: badgeNumber,
+							data: { data:toNotify }
+						});
+						playAudio('sounds/ring.mp3');
+					}
 					stopCheckAnswer=true;
 					//return false;
+				}
+				else {
+					notifyOnce = true;
 				}
 			}).always(function(data) {
 				setTimeout('check_answer()', 1000);
