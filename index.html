@@ -132,6 +132,7 @@
 						var displayThis = '<p style="color:red;"><b>Votre compte &agrave; &eacute;t&eacute; banni pour cause d&rsquo;utilisation abusive, d&eacute;sol&eacute;.<br>Vous pouvez nous contacter pour toute r&eacute;clamation: </b></p><center><a href="mailto:info@taximedia.fr" class="ui-btn ui-btn-icon-left ui-icon-mail ui-shadow-icon ui-corner-all">Courriel</a><a href="tel:0491034263" class="ui-btn ui-btn-icon-left ui-icon-phone ui-btn-inline">T&eacute;l&eacute;phone</a></center>';
 						$("#subReturns").empty().append(displayThis);
 					}
+					/*
 					if(data.phone_ok != 'OK') {
 						$.localStorage.setItem('registeredUser', 'KO');
 						$.localStorage.setItem('firstConnexionVar', 'YES');
@@ -139,6 +140,7 @@
 						var displayThis = '<p style="color:red;"><b>Le numéro de téléphone associé à votre compte doit être validé.<br>Vous pouvez vous connecter en utilisant vos identifiants ou vérifier votre numéro ci-dessus.</b></p>';
 						$("#fogotReturns").empty().append(displayThis);
 					}
+					*/
 				}, "json");
 			}
 			if((navigator.network.connection.type == Connection.NONE) || !window.jQuery){
@@ -393,11 +395,12 @@
 			{
 				//navigator.notification.alert(data.subscribed+' '+data.telexist+' '+data.telvalid+' '+data.emailvalid);
 				//$.localStorage.setItem('registeredUser', 'OK');
-				if ($.localStorage.getItem('firstConnexionVar') != 'NO') $.localStorage.setItem('firstConnexionVar', 'YES');
+				//if ($.localStorage.getItem('firstConnexionVar') != 'NO') $.localStorage.setItem('firstConnexionVar', 'YES');
 				$('#Accurate').val(data.nom);
 				$('#cellular').val(data.tel);
 				$('#login').val(data.tel);
 				//$.mobile.pageContainer.pagecontainer("change", "#infos", { transition: "slide"} );
+				/*
 				if(data.sms=='1') {
 					if(app) navigator.notification.alert('Afin de vérifier votre numéro de mobile vous allez recevoir vos identifiants par sms, nous vous remercions pour votre inscription.', alertDismissed, 'Mon Appli Taxi', 'OK');
 					else alert('Afin de vérifier votre numéro de mobile vous allez recevoir vos identifiants par sms, nous vous remercions pour votre inscription.');
@@ -406,6 +409,9 @@
 					if(app) navigator.notification.alert("Pour une raison technique ou parce que votre numéro de téléphone a généré trop d'envois de sms, nous ne pouvons valider votre compte. Veuillez nous contacter via contact@taximedia.fr", alertDismissed, 'Mon Appli Taxi', 'OK');
 					else alert("Pour une raison technique ou parce que votre numéro de téléphone a généré trop d'envois de sms, nous ne pouvons valider votre compte. Veuillez nous contacter via contact@taximedia.fr");
 				}
+				*/
+				if(app) navigator.notification.alert('Afin de vérifier votre email vous allez recevoir vos identifiants par sur l\'adresse communiquée, si vous ne recevez rien pensez à regarder dans les spams et en cas de problème nous vous invitons à nous contacter par email ou téléphone. Nous vous remercions pour votre inscription.', alertDismissed, 'Mon Appli Taxi', 'OK');
+				else alert('Afin de vérifier votre email vous allez recevoir vos identifiants par sur l\'adresse communiquée, si vous ne recevez rien pensez à regarder dans les spams et en cas de problème nous vous invitons à nous contacter par email ou téléphone. Nous vous remercions pour votre inscription.');
 				$.mobile.pageContainer.pagecontainer("change", "#connect", { transition: "slide"} );
 			}
 			else {
@@ -450,6 +456,7 @@
 				tel = data.tel;
 				email = data.email;
 				display = '<p style="color:green;"><b>Vous avez bien modifi&eacute; votre compte.</b></p><br>';
+				/*
 				if(data.check_again == 'YES') {
 					if(data.sms=='1') {
 						if(app) navigator.notification.alert('Vous avez bien modifié votre compte. Afin de re-vérifier votre numéro de mobile vous allez recevoir vos nouveaux identifiants par sms et devrez vous reconnectez avec, nous vous remercions pour votre inscription.', alertDismissed, 'Mon Appli Taxi', 'OK');
@@ -463,6 +470,7 @@
 					$.localStorage.setItem('firstConnexionVar', 'YES');
 					$.mobile.pageContainer.pagecontainer("change", "#connect", { transition: "slide"} );
 				}
+				*/
 			}
 			else {
 				display = '<p style="color:red;"><b>Vous n&rsquo;avez pas modifi&eacute; votre compte.</b></p><br>';
@@ -491,7 +499,7 @@
 	}
 	function reSendText() {
 		$.mobile.loading( "show" );
-		$.post("https://www.mytaxiserver.com/taxioffsrv/sendtext.php", { tel: $('#smsTel').val(), kinda: 'user'}, function(data) {
+		$.post("https://www.mytaxiserver.com/taxioffsrv/sendtext.php", { tel: $('#smsTel').val(), kinda: 'pro'}, function(data) {
 			if (data.valid_check=='KO') {
 				if (data.sms=='1') {
 					if(app) navigator.notification.alert('Afin de vérifier votre numéro de mobile vous allez recevoir vos identifiants par sms, nous vous remercions pour votre inscription.', alertDismissed, 'Mon Appli Taxi', 'OK');
@@ -532,9 +540,11 @@
 			{
 				display = '<p><b>Voici les informations d&rsquo;identification qui vous permettront d&rsquo;acc&egrave;der &agrave; votre compte :<br><span style="color:#09F;">Identifiant = ' + data.tel + '<br>Mot de passe = ' + data.pwd + '</span><br>Vous les recevrez dans quelques instants &agrave; cet email : <span style="color:#09F;">' + data.email + '</span>, merci.<br></b></p>';
 			}
+			/*
 			else if (data.phone_ok!='OK') {
 				display += '<p style="color:red;"><b>Nous ne pouvons divulguer vos informations personnelles car le num&eacute;ro de t&eacute;l&eacute;phone fourni n&rsquo;a pas &eacute;t&eacute; valid&eacute;.</b></p>';
 			}
+			*/
 			else {
 				display += '<p style="color:red;"><b>Nous ne pouvons divulguer vos informations personnelles car l&rsquo;identifiant ou l&rsquo;adresse mail fourni ne figure pas dans notre base de donn&eacute;e.</b></p>' + data.tel + ' - ' + data.email;
 			}
@@ -555,6 +565,7 @@
 	}
 	$(document).on( 'pagecreate', function() {
 		$( "body>[data-role='panel']" ).panel().enhanceWithin();
+		$.localStorage.setItem('firstConnexionVar', 'NO');
 	});
 	$( '#connect' ).live( 'pagecreate',function(event){
 		$('#displayForgot').click(function (){
@@ -968,6 +979,7 @@
 						var displayThis = '<p style="color:red;"><b>Votre compte &agrave; &eacute;t&eacute; banni pour cause d&rsquo;utilisation abusive, d&eacute;sol&eacute;.<br>Vous pouvez nous contacter pour toute r&eacute;clamation: </b></p><center><a href="mailto:info@taximedia.fr" class="ui-btn ui-btn-icon-left ui-icon-mail ui-btn-inline">Courriel</a><a href="tel:0491034263" class="ui-btn ui-btn-icon-left ui-icon-phone ui-btn-inline">T&eacute;l&eacute;phone</a></center>';
 						$("#subReturns").empty().append(displayThis);
 					}
+					/*
 					if(data.phone_ok != 'OK') {
 						$.localStorage.setItem('registeredUser', 'KO');
 						$.localStorage.setItem('firstConnexionVar', 'YES');
@@ -975,6 +987,7 @@
 						var displayThis = '<p style="color:red;"><b>Le numéro de téléphone associé à votre compte doit être validé.<br>Vous pouvez vous connecter en utilisant vos identifiants ou vérifier votre numéro ci-dessus.</b></p>';
 						$("#fogotReturns").empty().append(displayThis);
 					}
+					*/
 				}, "json");
 			}
 			locateMe();
