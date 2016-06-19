@@ -1124,7 +1124,7 @@
 		if (navigator.geolocation)
 		{
 			if (navigator.userAgent.toLowerCase().match(/android/)) {
-				navigator.geolocation.getCurrentPosition(codeLatLng, showError,{enableHighAccuracy:true, maximumAge:0, timeout: 9000});
+				navigator.geolocation.getCurrentPosition(codeLatLng, showError,{enableHighAccuracy:false, maximumAge:0, timeout: 9000});
 			}
 			else {
 				navigator.geolocation.getCurrentPosition(codeLatLng, showError,{enableHighAccuracy:true, maximumAge:0, timeout: 9000});
@@ -2468,12 +2468,20 @@
 			{
 				var number = data.taxi_phone_number;
 				var message = "Suite à un incident, je ne pourrais vous attendre.";
-				var intent = ""; //leave empty for sending sms using default intent
+				var options = {
+					replaceLineBreaks: false, // true to replace \n by a new line, false by default
+					android: {
+						intent: 'INTENT'  // send SMS with the native android SMS messaging
+						//intent: '' // send SMS without open any other app
+					}
+				};
 				var success = function () {
 				};
 				var error = function (e) {
+					if(app) navigator.notification.alert("L'incident a été déclaré toutefois, votre appareil semble ne pas gérer les sms, veuillez contacter le chauffeur pour l'avertir SVP.", alertDismissed, 'Mon Appli Taxi', 'OK');
+					else alert("L'incident a été déclaré toutefois, votre appareil semble ne pas gérer les sms, veuillez contacter le chauffeur pour l'avertir SVP.");
 				};
-				sms.send(number, message, intent, success, error);
+				sms.send(number, message, options, success, error);
 				//$.mobile.pageContainer.pagecontainer("change", "#infos", { transition: "slide"} );
 				//return false;
 			}
