@@ -1320,7 +1320,7 @@
 					//self.get('map').setZoom(12);
 					//self.get('map').setCenter(myPlace);
 					self.addMarker({'position': myPlace, 'bounds': true, 'icon': userIcon }).click(function() {
-						self.openInfoWindow({ 'content': '<p style="color:#333;">'+address+' / Lieu de prise en charge</p>' }, this);
+						self.openInfoWindow({ 'content': '<p style="color:#333;"><b>Vous &ecirc;tes ici:<br>'+address+'</b></p>' }, this);
 					});
 					//var gcenter = myPlace.lat().toFixed(4) +", "+ myPlace.lng().toFixed(4);
 					//var circleCenter = new google.maps.LatLng(gcenter);
@@ -1824,6 +1824,13 @@
 				var name = $(this).attr('name');
 				var appname = $(this).attr('appname');
 				var address = $(this).attr('address');
+				var licence = $(this).attr('taxi');
+				var rating = $(this).attr('rating');
+				var brand = $(this).attr('constructor');
+				var model = $(this).attr('model');
+				var color = $(this).attr('color');
+				var licence_plate = $(this).attr('licence_plate');
+				var seats = $(this).attr('seats');
 				var lat2 = $(this).attr('lat');
 				var lng2 = $(this).attr('lng');
 				var timestamp = $(this).attr('timestamp');
@@ -1840,7 +1847,7 @@
 				url = url.replace(/(?:\r\n|\r|\n)/g, '<br/>'); // Replaces line breaks by <br/>
 				if(appname=="montaxi") {
 					var mymarker = mapEvent.addMarker({ id: i ,'position': latlng, 'bounds': true, 'title': name, 'icon': cabIcon }).click(function() {
-						infoCont = '<div id="infoCont"><p style="color:#333;"><b>' + name + ' est &agrave; ' + parseFloat(distance).toFixed(1) + ' Km de vous.<br>' + address+ '</b></p></div>';
+						infoCont = '<div id="infoCont"><ul style="color:#333;"><b><li>Taxi Num&eacute;ro : '+licence+'</li><li>Distance : '+parseFloat(distance).toFixed(1) + ' Km de vous</li><li>Marque : '+brand+'</li><li>Mod&egrave;le : '+model+'</li><li>Couleur : '+color+'</li><li>Places : '+seats+'</li><li>Note : '+rating+' / 5</li><li>Imatriculation : '+licence_plate+'</li></b></ul></div>';
 						callBtn='<button class="ui-btn ui-corner-all ui-shadow ui-btn-c ui-btn-icon-left ui-icon-check cabs" id="' + i + '" onClick="sendJobOpen(\''+ url +'\')">Choisir</button>';
 						//mapEvent.openInfoWindow({ 'content':  infoCont}, this);
 						mapEvent.openInfoWindow({ 'content':  infoCont+callBtn}, this);
@@ -1852,7 +1859,7 @@
 				}
 				else {
 					mapEvent.addMarker({ id: i ,'position': latlng, 'bounds': true, 'title': name, 'icon': otherCabIcon }).click(function() {
-						infoCont = '<div id="infoCont"><p style="color:#333;"><b>' + name + ' est &agrave; ' + parseFloat(distance).toFixed(1) + ' Km de vous.<br>' + address+ '</b></p></div>';
+						infoCont = '<div id="infoCont"><ul style="color:#333;"><b><li>Taxi Num&eacute;ro : '+licence+'</li><li>Distance : '+parseFloat(distance).toFixed(1) + ' Km de vous</li><li>Marque : '+brand+'</li><li>Mod&egrave;le : '+model+'</li><li>Couleur : '+color+'</li><li>Places : '+seats+'</li><li>Note : '+rating+' / 5</li><li>Imatriculation : '+licence_plate+'</li></b></ul></div>';
 						callBtn='<button class="ui-btn ui-corner-all ui-shadow ui-btn-c ui-btn-icon-left ui-icon-check cabs" id="' + i + '" onClick="sendJobOpen(\''+ url +'\')">Choisir</button>';
 						//mapEvent.openInfoWindow({ 'content':  infoCont}, this);
 						mapEvent.openInfoWindow({ 'content':  infoCont+callBtn}, this);
@@ -1898,6 +1905,13 @@
 					var name = $(this).attr('name');
 					var appname = $(this).attr('appname');
 					var address = $(this).attr('address');
+					var licence = $(this).attr('taxi');
+					var rating = $(this).attr('rating');
+					var brand = $(this).attr('constructor');
+					var model = $(this).attr('model');
+					var color = $(this).attr('color');
+					var licence_plate = $(this).attr('licence_plate');
+					var seats = $(this).attr('seats');
 					var lat2 = $(this).attr('lat');
 					var lng2 = $(this).attr('lng');
 					var timestamp = $(this).attr('timestamp');
@@ -1914,7 +1928,7 @@
 					url = url.replace(/(?:\r\n|\r|\n)/g, '<br/>'); // Replaces line breaks by <br/>
 					if(appname=="montaxi") {
 						var mymarker = mapEvent.addMarker({ id: i ,'position': latlng, 'bounds': true, 'title': name, 'icon': cabIcon }).click(function() {
-							infoCont = '<div id="infoCont"><p style="color:#333;"><b>' + name + ' est &agrave; ' + parseFloat(distance).toFixed(1) + ' Km de vous.<br>' + address+ '</b></p></div>';
+							infoCont = '<div id="infoCont"><ul style="color:#333;"><b><li>Taxi Num&eacute;ro : '+licence+'</li><li>Distance : '+parseFloat(distance).toFixed(1) + ' Km de vous</li><li>Marque : '+brand+'</li><li>Mod&egrave;le : '+model+'</li><li>Couleur : '+color+'</li><li>Places : '+seats+'</li><li>Note : '+rating+' / 5</li><li>Imatriculation : '+licence_plate+'</li></b></ul></div>';
 							callBtn='<button class="ui-btn ui-corner-all ui-shadow ui-btn-c ui-btn-icon-left ui-icon-check cabs" id="' + i + '" onClick="sendJobOpen(\''+ url +'\')">Choisir</button>';
 							//mapEvent.openInfoWindow({ 'content':  infoCont}, this);
 							mapEvent.openInfoWindow({ 'content':  infoCont+callBtn}, this);
@@ -1926,7 +1940,7 @@
 					}
 					else {
 						mapEvent.addMarker({ id: i ,'position': latlng, 'bounds': true, 'title': name, 'icon': otherCabIcon }).click(function() {
-							infoCont = '<div id="infoCont"><p style="color:#333;"><b>' + name + ' est &agrave; ' + parseFloat(distance).toFixed(1) + ' Km de vous.<br>' + address+ '</b></p></div>';
+							infoCont = '<div id="infoCont"><ul style="color:#333;"><b><li>Taxi Num&eacute;ro : '+licence+'</li><li>Distance : '+parseFloat(distance).toFixed(1) + ' Km de vous</li><li>Marque : '+brand+'</li><li>Mod&egrave;le : '+model+'</li><li>Couleur : '+color+'</li><li>Places : '+seats+'</li><li>Note : '+rating+' / 5</li><li>Imatriculation : '+licence_plate+'</li></b></ul></div>';
 							callBtn='<button class="ui-btn ui-corner-all ui-shadow ui-btn-c ui-btn-icon-left ui-icon-check cabs" id="' + i + '" onClick="sendJobOpen(\''+ url +'\')">Choisir</button>';
 							//mapEvent.openInfoWindow({ 'content':  infoCont}, this);
 							mapEvent.openInfoWindow({ 'content':  infoCont+callBtn}, this);
@@ -2254,11 +2268,11 @@
 		if(!stopCheckAnswer) {
 			$.ajax({
 				type: "GET",
-				url: "http://www.mytaxiserver.com/appserver/open_status_json.php?hail_id=" + hail_id + "&dep=" + dep + "&check=1",
+				url: "http://www.mytaxiserver.com/appserver/open_status_json_lp.php?hail_id=" + hail_id + "&dep=" + dep + "&check=1",
 				data: { hail_id: hail_id, dep: dep, check: 1 },
 				dataType: "json",
 				cache: false,
-				timeout: 2000 // in milliseconds
+				timeout: 60000 // in milliseconds
 			}).done(function(data) {
 				if (data.display != 0)
 				{
