@@ -2356,11 +2356,11 @@
 		if(!stopCheckAnswer) {
 			$.ajax({
 				type: "GET",
-				url: "http://www.mytaxiserver.com/appserver/open_status_json.php?hail_id=" + hail_id + "&dep=" + dep + "&check=1",
+				url: "http://www.mytaxiserver.com/appserver/status_lp.php?hail_id=" + hail_id + "&dep=" + dep + "&check=1",
 				data: { idcourse: idcourse, dep: dep, check: 1 },
 				dataType: "html",
 				cache: false,
-				timeout: 2000 // in milliseconds
+				timeout: 60000 // in milliseconds
 			}).done(function(data) {
 				if (data != 0)
 				{
