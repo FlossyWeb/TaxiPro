@@ -1143,6 +1143,7 @@
 				// Reverse geocoding is OK...
 				$('#addressInput').val(data.features[0].properties.label);
 				$('#addressInput2').val(data.features[0].properties.label);
+				$('#addressInputPrices').val(data.features[0].properties.label);
 				insee = data.features[0].properties.citycode;
 				zip = data.features[0].properties.postcode;
 				dep = zip.substring(0, 2);
@@ -2241,7 +2242,6 @@
 	
     function sendJobOpen(url)
     {
-		clearInterval(refreshOpenMarkers);
 		$.mobile.loading( "show" );
 		$('.cabs').prop('disabled', true).addClass('ui-disabled'); // Prevents from multitap
 		$('.confButtons').hide('fast');
@@ -2251,12 +2251,15 @@
 			hail_id = data.hail_id;
 			//taxi_phone_number = data.taxi_phone_number;
 		}, "json").done(function() { 
-			if(hail_id!="") setTimeout('check_answer_open()', 500);
+			if(hail_id!="") setTimeout('check_answer_open()', 1000);
+			clearInterval(refreshOpenMarkers);
 			//check_answer_open();
+		}).always(function(data) {
 			$.mobile.loading( "hide" );
 		}).fail(function() { 
-			if(app) navigator.notification.alert("Erreur: La demande n'a pas été envoyée.", alertDismissed, 'Mon Appli Taxi', 'OK');
-			else alert("Erreur: La demande n'a pas été envoyée.");
+			if(app) navigator.notification.alert("Erreur: La demande n'a pas été envoyée, vous allez devoir recommencer, veuillez nous pardonner ce contretemps.", alertDismissed, 'Mon Appli Taxi', 'OK');
+			else alert("Erreur: La demande n'a pas été envoyée, vous allez devoir recommencer, veuillez nous pardonner ce contretemps.");
+			document.location.href='index.html';
 		});
     }
 	
@@ -2396,7 +2399,7 @@
 					notifyOnce = true;
 				}
 			}).always(function(data) {
-				setTimeout('check_answer()', 1000);
+				setTimeout('check_answer()', 2000);
 			});
 		}
     }
@@ -2847,12 +2850,14 @@
                     <button class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-mail" onClick="forgottenPwd()">Envoyer</button>
                 </div>
 				<p>&nbsp;</p>
+				<!--
                 <p><a href="#" id="displayReSendText" class="expends">V&eacute;rifier mon num&eacute;ro de t&eacute;l&eacute;phone</a></p>
                 <div id="reSendTextForm" style="display:none;">
 					<p style="font-size:small;">Veuillez renseigner ci-dessous le num&eacute;ro de t&eacute;l&eacute;phone associ&eacute; &agrave; votre compte.</p>
                     <input type="tel" id="smsTel" data-clear-btn="true" size="40" placeholder="Tel"/>
                     <button class="ui-btn ui-corner-all ui-shadow ui-btn-c ui-btn-icon-left ui-icon-mail" onClick="reSendText()">Envoyer</button>
                 </div>
+				-->
                 <p><a href="#" onClick="openSomeUrl('https://goo.gl/Bz4yK0')">Le.Taxi &ccedil;a marche comment? &Ccedil;a change quoi ?</a></p>
                 <div id="fogotReturns"></div>
 				<a href="mailto:info@taximedia.fr" class="ui-btn ui-btn-icon-left ui-icon-mail  ui-shadow-icon ui-corner-all">Nous contacter</a>
