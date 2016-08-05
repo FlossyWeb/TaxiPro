@@ -173,9 +173,11 @@
 			navigator.notification.alert("Veuillez ne pas quitter Mon Appli Taxi pendant la recheche de taxi disponibles", alertDismissed, 'Mon Appli Taxi', 'OK');
 		}
 		function onResume() {
-			if((navigator.network.connection.type == Connection.NONE) || !window.jQuery){
-				$("body").empty().append('<img src="no_network.png" width="'+screen.width+'" height="'+screen.height+'" onClick="window.location.reload()" />');
-			}
+			setTimeout(function() {
+				if((navigator.network.connection.type == Connection.NONE) || !window.jQuery){
+					$("body").empty().append('<img src="no_network.png" width="'+screen.width+'" height="'+screen.height+'" onClick="window.location.reload()" />');
+				}
+			}, 500);// iOS Quirks
 		}
 		function bgFunctionToRun() {
 			if(hail_id!="") check_answer_open();
