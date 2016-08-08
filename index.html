@@ -46,7 +46,7 @@
     <script src="barcodescanner.js"></script>
     <script src="contactNumberPicker.js"></script>
     <script src="sms.js"></script>
-    <script src="PowerManagement.js"></script>
+    <!-- <script src="PowerManagement.js"></script> -->
     <script type="text/javascript" src="js/jquery.html5storage.min.js"></script>
     <script type="text/javascript" src="js/jsimple-star-rating.min.js"></script>
     <script type="text/javascript" src="js/jqm-datebox-1.4.5.min.js"></script>
@@ -118,7 +118,7 @@
 			StatusBar.overlaysWebView(false);
 			StatusBar.backgroundColorByHexString("#99808E");
 			// prevent device from sleeping
-			window.plugins.powerManagement.acquire();
+			window.powermanagement.acquire();
 			if(($.localStorage.getItem('registeredUser') != 1) && ($.localStorage.getItem('registeredUser') != 'OK'))
 			{
 				//navigator.notification.alert("Valeur du Registre: "+$.localStorage.getItem('registeredUser'), alertDismissed, 'Mon Appli Taxi', 'OK');
@@ -146,9 +146,7 @@
 			if((navigator.network.connection.type == Connection.NONE) || !window.jQuery){
 				$("body").empty().append('<img src="no_network.png" width="'+screen.width+'" height="'+screen.height+'" onClick="window.location.reload()" />');
 			}
-			setTimeout(function() { 
-				locateMe();
-			}, 1000);
+			locateMe();
 			scanner = cordova.require("cordova/plugin/BarcodeScanner");
 			/*
 			// For Android => Enable background mode
@@ -2643,7 +2641,7 @@
                         <input type="tel" id="cellular" data-clear-btn="true" class="mustHave" size="20" placeholder="Tel *" style="min-height:3em;"/>
                     </td><td align="center">
                         <a href="#rememberMe" data-rel="popup" data-position-to="window">
-							<img src="visuels/ico_favori.png" width="100%" class="cursor" onClick="locateMe()" style="max-width:50px;"/>
+							<img src="visuels/ico_favori.png" width="100%" class="cursor" style="max-width:50px;"/>
 						</a>
                     </td></tr>
                     </tbody>
