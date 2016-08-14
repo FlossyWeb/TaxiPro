@@ -2355,6 +2355,7 @@
 	
     function check_answer()
     {
+		clearInterval(refreshOpenMarkers);
 		dep = $.sessionStorage.getItem('dep');
 		if(!stopCheckAnswer) {
 			$.ajax({
@@ -2370,7 +2371,6 @@
 					clearInterval(time);
 					clearTimeout(endcourse);
 					cancel(idcourse);
-					clearInterval(refreshOpenMarkers);
 					document.getElementById('stop').value = 1;
 					//var box = navigator.notification.alert(data);
 					//stopCall();
