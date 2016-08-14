@@ -148,7 +148,6 @@
 			}
 			locateMe();
 			scanner = cordova.require("cordova/plugin/BarcodeScanner");
-			/*
 			// For Android => Enable background mode
 			cordova.plugins.backgroundMode.enable();
 			cordova.plugins.backgroundMode.setDefaults({
@@ -156,9 +155,8 @@
 				ticker: 'App toujours en fonction (3 MINUTES MAX)',
 				text:   'Nous vous informons des courses en cours...'
 			});
-			*/
 			// For iOS => backgroundtask
-			backgroundtask.start(bgFunctionToRun);
+			//backgroundtask.start(bgFunctionToRun);
 			cordova.plugins.notification.local.clearAll(function() {
 				//alert("All notifications cleared");
 			}, this);

@@ -14,7 +14,7 @@
 	   Réservez votre taxi simplement via votre mobile avec l'application Taxi Pro.
 	</description>
 
-    <preference name="phonegap-version" value="cli-5.2.0" />
+    <preference name="phonegap-version" value="cli-6.3.0" />
     <preference name="orientation"      value="default" />
     <preference name="target-device"    value="universal" />
     <preference name="fullscreen"       value="false" />
@@ -46,9 +46,9 @@
 	<plugin name="cordova-sms-plugin" source="npm" spec="0.1.10" />
 	<plugin name="phonegap-plugin-barcodescanner" source="npm" />
 	<plugin name="cordova-plugin-powermanagement" source="npm" />
-	<plugin name="cordova-plugin-background-task" source="npm" />
-	<!-- 
 	<plugin name="cordova-plugin-background-mode" source="npm" spec="0.6.5" />
+	<!-- 
+	<plugin name="cordova-plugin-background-task" source="npm" />
 	<plugin name="cordova-plugin-contact-number-picker" source="npm" />
 	<plugin name="de.appplant.cordova.plugin.background-mode" spec="0.6.4" />
 	<plugin name="de.appplant.cordova.plugin.local-notification" spec="0.8.1" />
