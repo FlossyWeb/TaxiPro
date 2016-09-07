@@ -46,9 +46,9 @@
 	<plugin name="cordova-sms-plugin" source="npm" spec="0.1.10" />
 	<plugin name="phonegap-plugin-barcodescanner" source="npm" />
 	<plugin name="cordova-plugin-powermanagement" source="npm" />
-	<plugin name="cordova-plugin-background-mode" source="npm" spec="0.6.5" />
-	<!-- 
 	<plugin name="cordova-plugin-background-task" source="npm" />
+	<!-- 
+	<plugin name="cordova-plugin-background-mode" source="npm" spec="0.6.5" />
 	<plugin name="cordova-plugin-contact-number-picker" source="npm" />
 	<plugin name="de.appplant.cordova.plugin.background-mode" spec="0.6.4" />
 	<plugin name="de.appplant.cordova.plugin.local-notification" spec="0.8.1" />
@@ -59,8 +59,8 @@
     <preference name="xwalkMultipleApk" value="true" />      
     <plugin name="cordova-build-architecture" spec="https://github.com/MBuchalik/cordova-build-architecture.git#v1.0.1" source="git" />  
     <preference name="android-versionCode" value="1" />  
-	<preference name="buildArchitecture" value="x86" />
 	<!-- 
+	<preference name="buildArchitecture" value="x86" />
 	<plugin name='org.crosswalk.engine.x86' spec='1.3.0' source='pgb' />
 	<plugin name='org.crosswalk.engine' spec='1.3.0' source='pgb' />
 	-->
