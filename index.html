@@ -1594,15 +1594,21 @@
 			});
 			//$.post('https://www.mytaxiserver.com/appserver/open_follow.php', { hail_id: hail_id }, function(data){
 			$.post('http://www.mytaxiserver.com/appserver/open_follow.php', { hail_id: hail_id }, function(data){
-				var latlng = new google.maps.LatLng(data.lat, data.lng);
-				var display_name = 'Taxi ' + data.name;
-				var cabIcon = 'visuels/taxi_loc_icon.png';
-				self.addMarker({ id: 'cab', 'position': latlng, 'bounds': true, 'icon': cabIcon }).click(function() {
-					infoCont = '<p style="color:#333;"><b>Votre taxi joignable au: ' + data.address + '<br><span style="font-size: x-small;">(aclualis&eacute; &agrave; ' + data.timestamp+ ')</span></b></p>';
-					//infoCont = '<p style="color:#333;"><b>Votre taxi joignable au: <a data-ajax="false" href="tel:' + data.address + '" class="ui-btn ui-btn-c ui-corner-all ui-shadow ui-icon-phone ui-btn-icon-left">' + data.address + '</a><span style="font-size: x-small;">(aclualis&eacute; &agrave; ' + data.timestamp+ ')</span></b></p>';
-					//infoCont = '<p style="color:#333;"><b>Votre taxi joignable au: <a data-ajax="false" href="tel:' + data.address + '" class="ui-btn ui-btn-c ui-corner-all ui-shadow ui-icon-phone ui-btn-icon-left">' + data.address + '</a></b></p>';
-					self.openInfoWindow({ 'content':  infoCont}, this);
-				});
+				if(data.ok) {
+					var latlng = new google.maps.LatLng(data.lat, data.lng);
+					var display_name = 'Taxi ' + data.name;
+					var cabIcon = 'visuels/taxi_loc_icon.png';
+					self.addMarker({ id: 'cab', 'position': latlng, 'bounds': true, 'icon': cabIcon }).click(function() {
+						infoCont = '<p style="color:#333;"><b>Votre taxi joignable au: ' + data.address + '<br><span style="font-size: x-small;">(aclualis&eacute; &agrave; ' + data.timestamp+ ')</span></b></p>';
+						self.openInfoWindow({ 'content':  infoCont}, this);
+					});
+				}
+				else {
+					if(app) navigator.notification.alert('Vous ne pouvez suivre un taxi que 30 minutes avant le RDV !!', alertDismissed, 'Mon Appli Taxi', 'OK');
+					else alert('Vous ne pouvez suivre un taxi que 30 minutes avant le RDV !!');
+					//document.location.href='index.html';
+					$.mobile.pageContainer.pagecontainer("change", "#history", { transition: "slide"} );
+				}
 				//alert(data.lat+', '+data.lng+' - '+data.name+' - '+data.address+' '+data.timestamp);
 			}, "json").fail(function (jqXHR, textStatus, errorThrown) {
 				navigator.notification.alert('Erreur inconnue, le serveur ou la connexion internet sont indisponibles. ' + textStatus+', '+ errorThrown, alertDismissed, 'Mon Appli Taxi Erreur', 'OK');
