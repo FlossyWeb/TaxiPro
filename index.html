@@ -1100,6 +1100,18 @@
 					(place.address_components[1] && place.address_components[1].short_name || ''),
 					(place.address_components[2] && place.address_components[2].short_name || '')
 				].join(' ');
+				for (var i=0; i<place.address_components.length;i++)
+				{
+					for (var j=0;j<place.address_components[i].types.length;j++)
+					{
+						if (place.address_components[i].types[j] == "postal_code")
+						{
+							zip_code = place.address_components[i].long_name;
+							//zip = zip_code;
+							dep = zip_code.substring(0, 2);
+						}
+					}
+				}
 			}
 		});
 		var autocomplete2 = new google.maps.places.Autocomplete(input2, options);
@@ -1601,7 +1613,7 @@
 					var display_name = 'Taxi ' + data.name;
 					var cabIcon = 'visuels/taxi_loc_icon.png';
 					self.addMarker({ id: 'cab', 'position': latlng, 'bounds': true, 'icon': cabIcon }).click(function() {
-						infoCont = '<p style="color:#333;"><b>Votre taxi joignable au: ' + data.address + '<br><span style="font-size: x-small;">(aclualis&eacute; &agrave; ' + data.timestamp+ ')</span></b></p>';
+						infoCont = '<p style="color:#333;"><b>Votre taxi joignable au: <a data-ajax="false" href="tel:' + data.address + '" class="ui-btn ui-btn-c ui-corner-all ui-shadow ui-icon-phone ui-btn-icon-left">' + data.address + '</a>'+data.incident+'<span style="font-size: x-small;">(aclualis&eacute; &agrave; ' + data.timestamp+ ')</span></b></p>';
 						self.openInfoWindow({ 'content':  infoCont}, this);
 					});
 				}
@@ -1611,36 +1623,51 @@
 					//document.location.href='index.html';
 					$.mobile.pageContainer.pagecontainer("change", "#history", { transition: "slide"} );
 				}
-				//alert(data.lat+', '+data.lng+' - '+data.name+' - '+data.address+' '+data.timestamp);
+				if(data.status=='incident_taxi') {
+					if(app) navigator.notification.alert('Le chauffeur à déclaré un incident l\'empêchant de venir vous chercher !', alertDismissed, 'Mon Appli Taxi', 'OK');
+					else alert('Le chauffeur à déclaré un incident l\'empêchant de venir vous chercher !');
+					$.mobile.pageContainer.pagecontainer("change", "#history", { transition: "slide"} );
+				}
 			}, "json").fail(function (jqXHR, textStatus, errorThrown) {
 				navigator.notification.alert('Erreur inconnue, le serveur ou la connexion internet sont indisponibles. ' + textStatus+', '+ errorThrown, alertDismissed, 'Mon Appli Taxi Erreur', 'OK');
 			});
 			var track = setInterval( function () {
 				//$.post('https://www.mytaxiserver.com/appserver/open_follow.php', {  hail_id: hail_id }, function(data){
 				$.post('http://www.mytaxiserver.com/appserver/open_follow.php', {  hail_id: hail_id }, function(data){
-					//alert(data.lat+', '+data.lng+' - '+data.name+' - '+data.address+''+data.timestamp);
-					markerCab = self.get('markers')['cab'];
-					markerCab.setVisible(false);
-					var latlng = new google.maps.LatLng(data.lat, data.lng);
-					var display_name = 'Taxi ' + data.name;
-					var cabIcon = 'visuels/taxi_loc_icon.png';
-					self.addMarker({ id: 'cab', 'position': latlng, 'bounds': true, 'icon': cabIcon }).click(function() {
-						infoCont = '<p style="color:#333;"><b>Votre taxi joignable au: <a data-ajax="false" href="tel:' + data.address + '" class="ui-btn ui-btn-c ui-corner-all ui-shadow ui-icon-phone ui-btn-icon-left">' + data.address + '</a><span style="font-size: x-small;">(aclualis&eacute; &agrave; ' + data.timestamp+ ')</span></b></p>';
-						//infoCont = '<p style="color:#333;"><b>Votre taxi joignable au: <a data-ajax="false" href="tel:' + data.address + '" class="ui-btn ui-btn-c ui-corner-all ui-shadow ui-icon-phone ui-btn-icon-left">' + data.address + '</a></b></p>';
-						self.openInfoWindow({ 'content':  infoCont}, this);
-					});
-					var markerYou = self.get('markers')['you'];
-					markerYou.setVisible(false);
-					navigator.geolocation.getCurrentPosition(function(position, status) {
-						var latlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude)
-						lat = position.coords.latitude;
-						lng = position.coords.longitude;
-						self.get('map').panTo(latlng);
-						var userIcon = 'visuels/client_loc_icon.png';
-						self.addMarker({ id: 'you', 'position': latlng, 'bounds': true, 'icon': userIcon }).click(function() {
-							self.openInfoWindow({ 'content':  '<p style="color:#09F;"><b>Vous &Ecirc;tes ici</b></p>' }, this);
+					if(data.ok) {
+						markerCab = self.get('markers')['cab'];
+						markerCab.setVisible(false);
+						var latlng = new google.maps.LatLng(data.lat, data.lng);
+						var display_name = 'Taxi ' + data.name;
+						var cabIcon = 'visuels/taxi_loc_icon.png';
+						self.addMarker({ id: 'cab', 'position': latlng, 'bounds': true, 'icon': cabIcon }).click(function() {
+							infoCont = '<p style="color:#333;"><b>Votre taxi joignable au: <a data-ajax="false" href="tel:' + data.address + '" class="ui-btn ui-btn-c ui-corner-all ui-shadow ui-icon-phone ui-btn-icon-left">' + data.address + '</a>'+data.incident+'<span style="font-size: x-small;">(aclualis&eacute; &agrave; ' + data.timestamp+ ')</span></b></p>';
+							//infoCont = '<p style="color:#333;"><b>Votre taxi joignable au: <a data-ajax="false" href="tel:' + data.address + '" class="ui-btn ui-btn-c ui-corner-all ui-shadow ui-icon-phone ui-btn-icon-left">' + data.address + '</a></b></p>';
+							self.openInfoWindow({ 'content':  infoCont}, this);
 						});
-					}, showError,{enableHighAccuracy:true, maximumAge:0});
+						var markerYou = self.get('markers')['you'];
+						markerYou.setVisible(false);
+						navigator.geolocation.getCurrentPosition(function(position, status) {
+							var latlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude)
+							lat = position.coords.latitude;
+							lng = position.coords.longitude;
+							self.get('map').panTo(latlng);
+							var userIcon = 'visuels/client_loc_icon.png';
+							self.addMarker({ id: 'you', 'position': latlng, 'bounds': true, 'icon': userIcon }).click(function() {
+								self.openInfoWindow({ 'content':  '<p style="color:#09F;"><b>Vous &Ecirc;tes ici</b></p>' }, this);
+							});
+						}, showError,{enableHighAccuracy:true, maximumAge:0});
+					}
+					else {
+						if(app) navigator.notification.alert('Vous ne pouvez suivre un taxi que 30 minutes avant le RDV !!', alertDismissed, 'Mon Appli Taxi', 'OK');
+						else alert('Vous ne pouvez suivre un taxi que 30 minutes avant le RDV !!');
+						$.mobile.pageContainer.pagecontainer("change", "#history", { transition: "slide"} );
+					}
+					if(data.status=='incident_taxi') {
+						if(app) navigator.notification.alert('Le chauffeur à déclaré un incident l\'empêchant de venir vous chercher !', alertDismissed, 'Mon Appli Taxi', 'OK');
+						else alert('Le chauffeur à déclaré un incident l\'empêchant de venir vous chercher !');
+						$.mobile.pageContainer.pagecontainer("change", "#history", { transition: "slide"} );
+					}
 				}, "json");
 			}, 10000);
 		}});
