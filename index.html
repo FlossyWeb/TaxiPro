@@ -147,7 +147,6 @@
 				$("body").empty().append('<img src="no_network.png" width="'+screen.width+'" height="'+screen.height+'" onClick="window.location.reload()" />');
 			}
 			locateMe();
-			scanner = cordova.require("cordova/plugin/BarcodeScanner");
 			/*
 			// For Android => Enable background mode
 			cordova.plugins.backgroundMode.enable();
@@ -251,22 +250,13 @@
 	}
 	function goScan ()
 	{
-		if (app) {
-			// If app is runing we scan from the device camera
-			scanner.scan(
-				scanSuccess, 
-				function (error) {
-					navigator.notification.alert("Scan Erreur: " + error);
-				}
-			);
-		}
-		else {
-			$('#smsReturn').empty().append('Cette fonction n&rsquo;est disponible que sur l&rsquo;application mobile');
-			$( "#popSms" ).popup( "open", { positionTo: "window" } );
-			//navigator.notification.alert('WTF');
-		}
+		cordova.plugins.barcodeScanner.scan(
+			scanSuccess, 
+			function (error) {
+				navigator.notification.alert("Scan Erreur: " + error);
+			}
+		);
 	}
-
 	function Share()
 	{
 		var successCallbackPick = function(result){
