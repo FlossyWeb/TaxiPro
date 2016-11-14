@@ -212,7 +212,7 @@
 			fromApp = $.urlParam('from', url); // AppName
 			toApp = $.urlParam('to', url); // PageToGo
 			if(fromApp=='driver') {
-				$('#getBackDriver').append('<a href="montaxidriver://" class="ui-btn ui-btn-c ui-shadow ui-corner-all ui-btn-icon-left ui-icon-back">Retour app chauffeur</a>');
+				$('#getBackDriver').append('<a href="#" onClick="myTaxiBack()" class="ui-btn ui-btn-c ui-shadow ui-corner-all ui-btn-icon-left ui-icon-back">Retour app chauffeur</a>');
 			}
 			if(toApp=='history') {
 				//alert(toApp);
@@ -257,6 +257,10 @@
 				navigator.notification.alert("Scan Erreur: " + error);
 			}
 		);
+	}
+	function myTaxiBack()
+	{
+		window.open('montaxidriver://', '_system');
 	}
 	function Share()
 	{
@@ -2288,13 +2292,27 @@
 		$('.whatNext').hide('fast');
 		$('#answerOpen').empty().append('<p><b>Veuillez patienter pendant que nous traitons votre demande aupr&egrave;s du chauffeur ...<button type="button" class="cancel ui-btn ui-btn-b ui-shadow ui-corner-all ui-btn-icon-left ui-icon-delete" id="cancel" onClick="stopCallOpen()" value=""> Retour / Annulation </button></b></p>');
 		$.post("http://www.mytaxiserver.com/appserver/open_diary_app_share.php", url, function(data) {
-			hail_id = data.hail_id;
-			//taxi_phone_number = data.taxi_phone_number;
-		}, "json").done(function() { 
-			if(hail_id!="") setTimeout('check_answer_open()', 1000);
-			clearInterval(refreshOpenMarkers);
-			//check_answer_open();
-		}).always(function(data) {
+			if(data.reponse_code == '201') {
+				hail_id = data.hail_id;
+				clearInterval(refreshOpenMarkers);
+				//taxi_phone_number = data.taxi_phone_number;
+				if(data.hail_id!="") setTimeout('check_answer_open()', 1000);
+				//check_answer_open();
+			}
+			else if (data.message == 'banned') {
+				if(app) navigator.notification.alert("Erreur: La demande n'a pas été envoyée, votre compte a été temporairement exclu par l'état du dispositif le.taxi, veuillez nous pardonner ce contretemps.", alertDismissed, 'Mon Appli Taxi', 'OK');
+				else alert("Erreur: La demande n'a pas été envoyée, votre compte a été temporairement exclu par l'état du dispositif le.taxi, veuillez nous pardonner ce contretemps.");
+				document.location.href='index.html';
+			}
+			else if (data.message == 'available') {
+				if(app) navigator.notification.alert("Erreur: Ce taxi n'est plus disponible ! Veuillez nous pardonner ce contretemps.", alertDismissed, 'Mon Appli Taxi', 'OK');
+				else alert("Erreur: Ce taxi n'est plus disponible ! Veuillez nous pardonner ce contretemps.");
+			}
+			else {
+				if(app) navigator.notification.alert("Erreur: La demande n'a pas été envoyée, vous allez devoir recommencer, veuillez nous pardonner ce contretemps.", alertDismissed, 'Mon Appli Taxi', 'OK');
+				else alert("Erreur: La demande n'a pas été envoyée, vous allez devoir recommencer, veuillez nous pardonner ce contretemps.");
+			}
+		}, "json").always(function(data) {
 			$.mobile.loading( "hide" );
 		}).fail(function() { 
 			if(app) navigator.notification.alert("Erreur: La demande n'a pas été envoyée, vous allez devoir recommencer, veuillez nous pardonner ce contretemps.", alertDismissed, 'Mon Appli Taxi', 'OK');
