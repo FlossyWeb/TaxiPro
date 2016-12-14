@@ -2,7 +2,7 @@
 <widget xmlns = "http://www.w3.org/ns/widgets"
 		xmlns:gap = "http://phonegap.com/ns/1.0"
 		id = "com.taxibleuservices.mytaxipro"
-		version = "1.5.1">
+		version = "1.5.2">
     
     <author href="http://flossyweb.com" email="contact@flossyweb.com">
         FRANCOIS-REGIS SIMON
@@ -14,7 +14,7 @@
 	   Réservez votre taxi simplement via votre mobile avec l'application Taxi Pro.
 	</description>
 
-    <preference name="phonegap-version" value="cli-6.3.0" />
+    <preference name="phonegap-version" value="cli-6.4.0" />
     <preference name="orientation"      value="default" />
     <preference name="target-device"    value="universal" />
     <preference name="fullscreen"       value="false" />
@@ -47,9 +47,12 @@
 	<plugin name="cordova-sms-plugin" source="npm" spec="0.1.10" />
 	<plugin name="phonegap-plugin-barcodescanner" source="npm" />
 	<plugin name="cordova-plugin-powermanagement" source="npm" />
-	<plugin name="cordova-plugin-background-mode" source="npm" spec="0.6.5" />
-	<!-- 
+	<plugin name="cordova-plugin-mauron85-background-geolocation" spec="2.2.5" source="npm">
+		<variable name="ALWAYS_USAGE_DESCRIPTION" value="CELA PERMETTRA AUX TAXIS DE CONNAITRE VOTRE POSITION." />
+	</plugin>
 	<plugin name="cordova-plugin-background-task" source="npm" />
+	<!-- 
+	<plugin name="cordova-plugin-background-mode" source="npm" spec="0.6.5" />
 	<plugin name="de.appplant.cordova.plugin.local-notification" spec="0.8.4" source="npm" />
 	<plugin name="de.appplant.cordova.plugin.local-notification-ios9-fix" spec="0.8.2" />
 	-->
@@ -57,8 +60,7 @@
 	<plugin name="cordova-plugin-crosswalk-webview" source="npm" version="1.8.0" />  
     <preference name="xwalkMultipleApk" value="true" />      
     <plugin name="cordova-build-architecture" spec="https://github.com/MBuchalik/cordova-build-architecture.git#v1.0.1" source="git" />  
-    <preference name="android-versionCode" value="3099" />  
-	<preference name="buildArchitecture" value="x86" />
+    <preference name="android-versionCode" value="3100" />  
 	<!-- 
 	<preference name="buildArchitecture" value="x86" />
 	<plugin name='org.crosswalk.engine.x86' spec='1.3.0' source='pgb' />

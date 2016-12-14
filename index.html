@@ -94,6 +94,8 @@
 	var refreshOpenMarkers;
 	var markerCab;
 	var countMarkerCab;
+	var markerMe;
+	var myNewPlace;
 	var notifyOnce = true;
 	var track;
 
@@ -147,8 +149,7 @@
 			if((navigator.network.connection.type == Connection.NONE) || !window.jQuery){
 				$("body").empty().append('<img src="no_network.png" width="'+screen.width+'" height="'+screen.height+'" onClick="window.location.reload()" />');
 			}
-			locateMe();
-			
+			/*
 			// For Android => Enable background mode
 			cordova.plugins.backgroundMode.enable();
 			cordova.plugins.backgroundMode.setDefaults({
@@ -156,9 +157,62 @@
 				ticker: 'App toujours en fonction (3 MINUTES MAX)',
 				text:   'Nous vous informons des courses en cours...'
 			});
-			
+			*/
 			// For iOS => backgroundtask
-			//backgroundtask.start(bgFunctionToRun);
+			backgroundtask.start(bgFunctionToRun);
+			// Efficient and batterie saving geolocation...
+			var geoCallbackFn = function(location) {
+				//alert('[js] BackgroundGeolocation callback:  ' + location.latitude + ',' + location.longitude);
+				// Do your HTTP request here to POST location to your server. 
+				// jQuery.post(url, JSON.stringify(location)); 
+				lat = location.latitude;
+				lng = location.longitude;
+				$.get('http://api-adresse.data.gouv.fr/reverse/', {lat: lat, lon: lng, type: ''}, function(data) {
+					//alert(data.features[0].properties.label+' - '+data.features[0].properties.postcode);
+					if(data.features[0].properties.label!='baninfo') {
+						// Reverse geocoding is OK...
+						$('#addressInput').val(data.features[0].properties.label);
+						$('#addressInput2').val(data.features[0].properties.label);
+						$('#addressInputPrices').val(data.features[0].properties.label);
+						insee = data.features[0].properties.citycode;
+						zip = data.features[0].properties.postcode;
+						dep = zip.substring(0, 2);
+						$.sessionStorage.setItem('dep', dep);
+					}
+				}, "json");
+				/*
+				IMPORTANT:  You must execute the finish method here to inform the native plugin that you're finished,
+				and the background-task may be completed.  You must do this regardless if your HTTP request is successful or not.
+				IF YOU DON'T, ios will CRASH YOUR APP for spending too much time in the background.
+				*/
+				backgroundGeolocation.finish();
+			};
+			var geoFailureFn = function(error) {
+				//if(app) navigator.notification.alert('BackgroundGeolocation error', alertDismissed, 'Mon Appli Taxi', 'OK');
+				//else alert('BackgroundGeolocation error');
+				navigator.notification.confirm('Erreur de Géolocalisation, voulez-vous aller dans les réglages afin d\'activer le service de géolocalisation pour cette app ?', 'Mon Appli Taxi', function() {
+					backgroundGeolocation.showAppSettings();
+				});
+			};
+			// BackgroundGeolocation is highly configurable. See platform specific configuration options 
+			backgroundGeolocation.configure(geoCallbackFn, geoFailureFn, {
+				desiredAccuracy: 10,
+				stationaryRadius: 10,
+				distanceFilter: 10,
+				activityType: 'Fitness',
+				startForeground: true,
+				// Android only section 
+				notificationTitle: 'Mon Appli Taxi',
+				notificationText: 'Suivi de votre position',
+				notificationIconColor: '#FEDD1E',
+				locationProvider: backgroundGeolocation.provider.ANDROID_ACTIVITY_PROVIDER,
+				fastestInterval: 10000,
+				stopOnStillActivity: true, // triggers callback weither device has moved or not according to the interval setting.
+				interval: 30000
+			});
+			// Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app. 
+			backgroundGeolocation.start();
+			locateMe();
 			cordova.plugins.notification.local.clearAll(function() {
 				//alert("All notifications cleared");
 			}, this);
@@ -1334,7 +1388,7 @@
 					self.get('map').panTo(myPlace);
 					//self.get('map').setZoom(12);
 					//self.get('map').setCenter(myPlace);
-					self.addMarker({'position': myPlace, 'bounds': true, 'icon': userIcon }).click(function() {
+					self.addMarker({id: 'Me', 'position': myPlace, 'bounds': true, 'icon': userIcon }).click(function() {
 						self.openInfoWindow({ 'content': '<p style="color:#333;"><b>Vous &ecirc;tes ici:<br>'+address+'</b></p>' }, this);
 					});
 					//var gcenter = myPlace.lat().toFixed(4) +", "+ myPlace.lng().toFixed(4);
@@ -1344,8 +1398,8 @@
 						'fillColor': "#008595", 
 						'fillOpacity': 0.25, 
 						'center': myPlace, 
-						'radius': 2000, 
-						'clickable': false 
+						'radius': 1000, 
+						'clickable': true 
 					});
 					
 					//searchLocationsNearOpen(myPlace, self);
@@ -1374,7 +1428,7 @@
 	$('#map_page').live('pagecreate', function() {
         endcourse = setTimeout( function () {
 			if(!stopCheckAnswer) {
-				$("#cancel").trigger('click');
+				$("#footer_map #cancel").trigger('click');
 				badgeNumber = 1;
 				cordova.plugins.notification.local.schedule({
 					id: 1,
@@ -1469,7 +1523,7 @@
 						'fillColor': "#008595", 
 						'fillOpacity': 0.25, 
 						'center': myPlace, 
-						'radius': 2000, 
+						'radius': 1000, 
 						'clickable': false 
 					});
 					
@@ -1950,6 +2004,26 @@
 				markerCab = mapEvent.get('markers')[k];
 				markerCab.setVisible(false);
 			}
+			markerMe = mapEvent.get('markers')['Me'];
+			markerMe.setVisible(false);
+			rdvpoint = document.getElementById("addressInput").value;
+			rdvlat = lat;
+			rdvlng = lng;
+			myNewPlace = new google.maps.LatLng(lat, lng);
+			mapEvent.get('map').panTo(myNewPlace);
+			mapEvent.addMarker({id: 'Me', 'position': myNewPlace, 'bounds': true, 'icon': 'visuels/client_loc_icon.png' }).click(function() {
+				mapEvent.openInfoWindow({ 'content': '<p style="color:#333;"><b>Vous &ecirc;tes ici:<br>'+address+'</b></p>' }, this);
+			});
+			/*
+			mapEvent.addShape('Circle', {
+				'strokeWeight': 0, 
+				'fillColor': "#008595", 
+				'fillOpacity': 0.25, 
+				'center': myNewPlace, 
+				'radius': 1000, 
+				'clickable': true 
+			});
+			*/
 			$.post('http://www.mytaxiserver.com/appserver/open_app_dcvp_xml.php', {lat: rdvlat, lng: rdvlng, type: typecar, howmany: howMany, cb: cb, pmr: pmr, pet: pet, group: group, dep: dep, zip: zip, pass: 'true'}, function(xml){
 				//navigator.notification.alert('IN');
 				$(xml).find('marker').each(function(){
@@ -2358,6 +2432,7 @@
 					else {
 						$('.whatNext').empty().append('<button onClick="refreshApp()" class="ui-btn ui-corner-all ui-shadow ui-btn-c ui-btn-icon-left ui-icon-home">Revenir &agrave; l&rsquo;accueil</button>');
 						$('.whatNext').show('fast');
+						if (data.status == "timeout_customer") $('.confButtons').hide('fast'); // In this case confButtons have been shown so we hide them (change text in open_status_json_lp)
 					}
 					//$( "#answerBoxOpen" ).popup( "open", { positionTo: "window" } );
 					if(notifyOnce) {
@@ -2486,7 +2561,7 @@
 		var wait2getBack = setTimeout( function () {
 			document.location.href='index.html';
 			//$.mobile.pageContainer.pagecontainer("change", "#infos", { transition: "slide"} );
-		}, 1000);
+		}, 5000);
 	}
     function goback(flag)
     {
@@ -2881,6 +2956,8 @@
 					<p><strong>
 						Vous avez annul&eacute; votre demande ou 
 						aucun taxis n&rsquo;a r&eacute;pondu dans le temps imparti, vous devriez rechercher de nouveau.
+						<br>
+						Vous serez redirig&eacute; vers la recherche dans un instant.
 					</strong></p>
 				</div>
 			</div>
