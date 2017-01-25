@@ -33,7 +33,7 @@
             // Make your jQuery Mobile framework configuration changes here!
             $.support.cors = true;
             $.mobile.allowCrossDomainPages = true;
-            $.mobile.selectmenu.prototype.options.nativeMenu = false;
+            $.mobile.selectmenu.prototype.options.nativeMenu = true;
 			//$.mobile.ajaxEnabled = false;
 			$.mobile.loader.prototype.options.text = "Veuillez patienter pendant le chargement. Merci de votre confiance !";
 			$.mobile.loader.prototype.options.textVisible = "true";
@@ -149,7 +149,7 @@
 			if((navigator.network.connection.type == Connection.NONE) || !window.jQuery){
 				$("body").empty().append('<img src="no_network.png" width="'+screen.width+'" height="'+screen.height+'" onClick="window.location.reload()" />');
 			}
-			
+			/*
 			// For Android => Enable background mode
 			cordova.plugins.backgroundMode.enable();
 			cordova.plugins.backgroundMode.setDefaults({
@@ -157,9 +157,9 @@
 				ticker: 'App toujours en fonction (3 MINUTES MAX)',
 				text:   'Nous vous informons des courses en cours...'
 			});
-			
+			*/
 			// For iOS => backgroundtask
-			//backgroundtask.start(bgFunctionToRun);
+			backgroundtask.start(bgFunctionToRun);
 			// Efficient and batterie saving geolocation...
 			var geoCallbackFn = function(location) {
 				//alert('[js] BackgroundGeolocation callback:  ' + location.latitude + ',' + location.longitude);
@@ -2739,12 +2739,12 @@
 				<thead><tr><th width="50%"></th><th width="34%"></th><th width="16%"></th></tr></thead>
 				<tbody>
 				<tr><td>
-					<img src="visuels/header.png" width="100%" style="max-width:512px;"/>
+					<img src="visuels/header.png" alt="Accueil" width="100%" style="max-width:512px;"/>
 				</td><td>
 					<p>&nbsp;</p>
 				</td><td align="center">
-					<a href="#homepanel" id="panel_poper" data-role="none" style="width:90%;">
-						<img src="visuels/ico_menu.png" width="100%" style="max-width:175px;"/>
+					<a href="#homepanel" id="panel_poper" data-role="none" title="Ouvrir le menu" style="width:90%;">
+						<img src="visuels/ico_menu.png" alt="Menu" width="100%" style="max-width:175px;"/>
 					</a>
 				</td></tr>
 				</tbody>
@@ -2759,33 +2759,33 @@
                 <input type="hidden" id="group" size="16" value="1"/>
                 <input type="hidden" id="exclu" size="1" value="0"/>
                 <input type="hidden" id="goFavs" size="1" value="0"/>
-                <table width="100%" border="0">
+                <table width="100%" border="0" summary="Informations relatives à la commande du taxi">
                 	<thead><tr><th width="90%"></th><th width="10%"></th></tr></thead>
                     <tbody>
                 	<tr><td>
-                        <input type="text" id="addressInput" data-clear-btn="true" size="40" placeholder="Adresse RDV" width="90%" style="min-height:3em;"/>
+                        <input type="text" id="addressInput" data-clear-btn="true" size="40" placeholder="Adresse RDV" title="Adresse RDV" width="90%" style="min-height:3em;"/>
                     </td><td align="center">
-						<img src="visuels/ico_geolocalisation.png" width="100%" class="cursor" onClick="locateMe()" style="max-width:40px;"/>
+						<img src="visuels/ico_geolocalisation.png" alt="Affiner ma position GPS" width="100%" class="cursor" onClick="locateMe()" style="max-width:40px;"/>
                         <!-- <button onClick="locateMe()" class="ui-btn ui-btn-c ui-icon-location ui-shadow-icon ui-btn-icon-notext ui-corner-all"></button> -->
                     </td></tr>
                 <input type="hidden" id="DestAddress" size="10" value="DESTINATION"/>
                 	<tr><td>
-                        <input type="text" id="Accurate" data-clear-btn="true" class="mustHave" size="32" placeholder="Nom *" style="min-height:3em;"/>
+                        <input type="text" id="Accurate" data-clear-btn="true" class="mustHave" size="32" placeholder="Nom *" title="Nom prénom, champs obligatoire" style="min-height:3em;"/>
                     </td><td align="center">
-						<img src="visuels/ico_modif.png" width="100%" class="cursor" onClick="getContact()" style="max-width:45px;"/>
+						<img src="visuels/ico_modif.png" width="100%" class="cursor" onClick="getContact()" alt="Chercher un ami dans mon carnet d'adresse et commander pour lui" style="max-width:45px;"/>
                         <!-- <button onClick="getContact()" class="ui-btn ui-btn-c ui-icon-edit ui-shadow-icon ui-btn-icon-notext ui-corner-all"></button> -->
                     </td></tr>
                 	<tr><td>
-                        <input type="tel" id="cellular" data-clear-btn="true" class="mustHave" size="20" placeholder="Tel *" style="min-height:3em;"/>
+                        <input type="tel" id="cellular" data-clear-btn="true" class="mustHave" size="20" placeholder="Tel *" title="Téléphone, champs obligatoire" style="min-height:3em;"/>
                     </td><td align="center">
-                        <a href="#rememberMe" data-rel="popup" data-position-to="window">
+                        <a href="#rememberMe" data-rel="popup" data-position-to="window" title="Dernières informations saisies">
 							<img src="visuels/ico_favori.png" width="100%" class="cursor" style="max-width:50px;"/>
 						</a>
                     </td></tr>
                     </tbody>
                 </table>
                 <!-- <p style="font-size:small;"><em>*</em> Ces informations sont obligatoires</p> -->
-                <p class="expends"><b>Un besoin particulier ?</b><br><img src="visuels/dots.png" width="100%" style="max-width:1200px;"/></p>
+                <p class="expends"><b>Un besoin particulier ?</b><br><img src="visuels/dots.png" alt="Un besoin particulier ? Ouvrir le formulaire complet" width="100%" style="max-width:1200px;"/></p>
                 <div id="details">
                     <label for="howMany">Nombre de passagers :</label>
                     <input name="howMany" id="howMany" min="1" max="20" value="1" data-theme="c" data-show-value="true" data-popup-enabled="true" type="range">
