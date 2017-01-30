@@ -149,7 +149,7 @@
 			if((navigator.network.connection.type == Connection.NONE) || !window.jQuery){
 				$("body").empty().append('<img src="no_network.png" width="'+screen.width+'" height="'+screen.height+'" onClick="window.location.reload()" />');
 			}
-			/*
+			
 			// For Android => Enable background mode
 			cordova.plugins.backgroundMode.enable();
 			cordova.plugins.backgroundMode.setDefaults({
@@ -157,9 +157,9 @@
 				ticker: 'App toujours en fonction (3 MINUTES MAX)',
 				text:   'Nous vous informons des courses en cours...'
 			});
-			*/
+			
 			// For iOS => backgroundtask
-			backgroundtask.start(bgFunctionToRun);
+			//backgroundtask.start(bgFunctionToRun);
 			// Efficient and batterie saving geolocation...
 			var geoCallbackFn = function(location) {
 				//alert('[js] BackgroundGeolocation callback:  ' + location.latitude + ',' + location.longitude);
