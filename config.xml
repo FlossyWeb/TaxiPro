@@ -67,7 +67,8 @@
 	<plugin name="cordova-plugin-crosswalk-webview" source="npm" version="1.8.0" />
     <preference name="xwalkMultipleApk" value="true" />      
     <plugin name="cordova-build-architecture" spec="https://github.com/MBuchalik/cordova-build-architecture.git#v1.0.1" source="git" />  
-    <preference name="android-versionCode" value="3102" />
+    <preference name="android-versionCode" value="3103" />
+	<preference name="buildArchitecture" value="x86" />
 	<!-- 
 	<preference name="buildArchitecture" value="x86" />
 	<plugin name='org.crosswalk.engine.x86' spec='1.3.0' source='pgb' />
