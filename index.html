@@ -21,13 +21,13 @@
             media="(device-width: 320px) and (device-height: 568px)
             and (-webkit-device-pixel-ratio: 2)"
             href="visuels/startup_image_i5.png">
-    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile.structure-1.4.5.min.css" />
+    <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile.structure-1.4.5.min.css" />
 	<link rel="stylesheet" href="css/themes/monTaxiPro.min.css" />
 	<link rel="stylesheet" href="css/themes/jquery.mobile.icons.min.css" />
     <link type="text/css" rel="stylesheet" href="css/jqm-datebox-1.4.5.min.css" />
     <link type="text/css" rel="stylesheet" href="css/dcvpad.css" />
-	<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
-    <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+	<script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="https://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 	<script type="text/javascript">
         $( document ).on( "mobileinit", function() {
             // Make your jQuery Mobile framework configuration changes here!
@@ -41,7 +41,7 @@
 			$.mobile.loader.prototype.options.html = '<span class="ui-bar ui-overlay-a ui-corner-all"><center><img src="visuels/preload.gif"/><br><span style="color:#F00;">Veuillez patienter pendant le chargement</span><br>Merci de votre confiance !</center></span>';
         });
     </script>    
-    <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
     <script src="phonegap.js"></script>
     <script src="barcodescanner.js"></script>
     <script src="sms.js"></script>
@@ -103,6 +103,8 @@
 	var scanner;
 	// Detect wether it is an App or WebApp
 	var app;
+	// openPlugin
+	var openPdf;
 
 	////////////////////////////////////////////////////////////
 	
@@ -149,6 +151,7 @@
 			if((navigator.network.connection.type == Connection.NONE) || !window.jQuery){
 				$("body").empty().append('<img src="no_network.png" width="'+screen.width+'" height="'+screen.height+'" onClick="window.location.reload()" />');
 			}
+			openPdf = cordova.plugins.disusered.open;
 			
 			// For Android => Enable background mode
 			cordova.plugins.backgroundMode.enable();
@@ -167,7 +170,7 @@
 				// jQuery.post(url, JSON.stringify(location)); 
 				lat = location.latitude;
 				lng = location.longitude;
-				$.get('http://api-adresse.data.gouv.fr/reverse/', {lat: lat, lon: lng, type: ''}, function(data) {
+				$.get('https://api-adresse.data.gouv.fr/reverse/', {lat: lat, lon: lng, type: ''}, function(data) {
 					//alert(data.features[0].properties.label+' - '+data.features[0].properties.postcode);
 					if(data.features[0].properties.label!='baninfo') {
 						// Reverse geocoding is OK...
@@ -312,6 +315,16 @@
 			}
 		);
 	}
+	function successOpenPdf() {
+	  console.log('Success');
+	}
+	function errorOpenPdf(code) {
+	  if (code === 1) {
+		console.log('No file handler found');
+	  } else {
+		console.log('Undefined error');
+	  }
+	}
 	function myTaxiBack()
 	{
 		window.open('montaxidriver://', '_system');
@@ -324,7 +337,7 @@
 			{
 				window.plugins.ContactPicker.chooseContact(function(contactInfo) {
 					var number = contactInfo.phones[0];
-					var message = "Téléchargez l'app Mon Appli Taxi Pro en suivant ce lien : http://www.taximedia.fr/stores.php?app=taxipro";
+					var message = "Téléchargez l'app Mon Appli Taxi Pro en suivant ce lien : https://www.taximedia.fr/stores.php?app=taxipro";
 					var intent = ""; //leave empty for sending sms using default intent
 					var smsSuccess = function () {
 						//navigator.notification.alert('Message sent successfully');
@@ -596,7 +609,7 @@
 	}
 	function openSomeUrl(url)
 	{
-		//window.plugins.childBrowser.showWebPage('http://www.taximedia.fr/redir.php', { showLocationBar: true });
+		//window.plugins.childBrowser.showWebPage('https://www.taximedia.fr/redir.php', { showLocationBar: true });
 		window.open(url,'_blank','location=false,enableViewportScale=yes,scrollbars=yes,closebuttoncaption=Fermer');
 	}
 	$(document).on( 'pagecreate', function() {
@@ -1199,11 +1212,11 @@
 		}
 	}
 	function codeLatLng(position) {
-		// Using http://adresse.data.gouv.fr
+		// Using https://adresse.data.gouv.fr
 		lat = position.coords.latitude;
 		lng = position.coords.longitude;
-		//http://api-adresse.data.gouv.fr/reverse/?lon=2.37&lat=48.357&type=street
-		$.get('http://api-adresse.data.gouv.fr/reverse/', {lat: lat, lon: lng, type: ''}, function(data) {
+		//https://api-adresse.data.gouv.fr/reverse/?lon=2.37&lat=48.357&type=street
+		$.get('https://api-adresse.data.gouv.fr/reverse/', {lat: lat, lon: lng, type: ''}, function(data) {
 			//alert(data.features[0].properties.label+' - '+data.features[0].properties.postcode);
 			if(data.features[0].properties.label!='baninfo') {
 				// Reverse geocoding is OK...
@@ -1292,7 +1305,7 @@
 			  x.innerHTML="<strong>Erreur de G&eacute;olocalisation, red&eacute;marrage du smartphone n&eacute;c&eacute;ssaire.</strong>"
 			  geoAlert="Erreur de Géolocalisation, libre à vous d'activer le service de géolocalisation pour cette app dans les réglages.";
 		}
-		if (error.code == error.TIMEOUT) {
+		if (error.code == error.TIMEOUT || error.code == error.POSITION_UNAVAILABLE) {
 			// Fall back to low accuracy and any cached position available...
 			navigator.geolocation.getCurrentPosition(codeLatLng, function(){
 				//$( "#errorPop" ).popup( "open", { positionTo: "window" } );
@@ -1464,7 +1477,7 @@
         }, 1000);
 		$.mobile.loading( "show" );
 		var  address = $('#addressInput').val();
-		$.get('http://api-adresse.data.gouv.fr/search/', {q: address, type: ''}, function(data) {
+		$.get('https://api-adresse.data.gouv.fr/search/', {q: address, type: ''}, function(data) {
 		}, "json").done(function(data) { 
 			if(data.features[0].properties.label!='baninfo') {
 				// Geocoding is OK...
@@ -1571,7 +1584,7 @@
 		$('#fleet_map').gmap({'center': mobileMap.center, 'zoom': mobileMap.zoom, 'disableDefaultUI':true, 'mapTypeId': google.maps.MapTypeId.ROADMAP, 'callback': function() {
 			var self = this;
 			dep = $.sessionStorage.getItem('dep');
-			$.post('http://www.mytaxiserver.com/appserver/station_fleet_xml.php?group=1&dep='+dep, function(xml){
+			$.post('https://www.mytaxiserver.com/appserver/station_fleet_xml.php?group=1&dep='+dep, function(xml){
 				$(xml).find('marker').each(function(){
 					var name = $(this).attr('name');
 					var address = $(this).attr('address');
@@ -1661,7 +1674,7 @@
 				}
 			});
 			//$.post('https://www.mytaxiserver.com/appserver/open_follow.php', { hail_id: hail_id }, function(data){
-			$.post('http://www.mytaxiserver.com/appserver/open_follow.php', { hail_id: hail_id }, function(data){
+			$.post('https://www.mytaxiserver.com/appserver/open_follow.php', { hail_id: hail_id }, function(data){
 				if(data.ok) {
 					var latlng = new google.maps.LatLng(data.lat, data.lng);
 					var display_name = 'Taxi ' + data.name;
@@ -1689,7 +1702,7 @@
 			});
 			track = setInterval( function () {
 				//$.post('https://www.mytaxiserver.com/appserver/open_follow.php', {  hail_id: hail_id }, function(data){
-				$.post('http://www.mytaxiserver.com/appserver/open_follow.php', {  hail_id: hail_id }, function(data){
+				$.post('https://www.mytaxiserver.com/appserver/open_follow.php', {  hail_id: hail_id }, function(data){
 					if(data.ok) {
 						markerCab = self.get('markers')['cab'];
 						markerCab.setVisible(false);
@@ -1791,7 +1804,7 @@
 				}
 			});
 			//$.post('https://www.mytaxiserver.com/appserver/follow.php', { taxi: ftaxi, idcourse: fidcourse, dep: fdep, tel: ftel, table: ftable }, function(data){
-			$.post('http://www.mytaxiserver.com/appserver/follow.php', { taxi: ftaxi, idcourse: fidcourse, dep: fdep, tel: ftel, table: ftable }, function(data){
+			$.post('https://www.mytaxiserver.com/appserver/follow.php', { taxi: ftaxi, idcourse: fidcourse, dep: fdep, tel: ftel, table: ftable }, function(data){
 				if(data.ok) {
 					var latlng = new google.maps.LatLng(data.lat, data.lng);
 					var display_name = 'Taxi ' + data.name;
@@ -1813,7 +1826,7 @@
 			});
 			track = setInterval( function () {
 				//$.post('https://www.mytaxiserver.com/appserver/follow.php', { taxi: ftaxi, idcourse: fidcourse, dep: fdep, tel: ftel, table: ftable }, function(data){
-				$.post('http://www.mytaxiserver.com/appserver/follow.php', { taxi: ftaxi, idcourse: fidcourse, dep: fdep, tel: ftel, table: ftable }, function(data){
+				$.post('https://www.mytaxiserver.com/appserver/follow.php', { taxi: ftaxi, idcourse: fidcourse, dep: fdep, tel: ftel, table: ftable }, function(data){
 					if(data.ok) {
 						markerCab = self.get('markers')['cab'];
 						markerCab.setVisible(false);
@@ -1923,7 +1936,7 @@
 		var openAvail = false;
 		var once = true; // we only trigger the first marker
 		//$.post('https://www.mytaxiserver.com/appserver/open_app_dcvp_xml.php', {lat: rdvlat, lng: rdvlng, type: typecar, howmany: howMany, cb: cb, group: group, dep: dep, zip: zip, pass: 'true'}, function(xml){
-		$.post('http://www.mytaxiserver.com/appserver/open_app_dcvp_xml.php', {lat: rdvlat, lng: rdvlng, type: typecar, howmany: howMany, cb: cb, pmr: pmr, pet: pet, group: group, dep: dep, zip: zip, pass: 'true'}, function(xml){
+		$.post('https://www.mytaxiserver.com/appserver/open_app_dcvp_xml.php', {lat: rdvlat, lng: rdvlng, type: typecar, howmany: howMany, cb: cb, pmr: pmr, pet: pet, group: group, dep: dep, zip: zip, pass: 'true'}, function(xml){
 			//navigator.notification.alert('IN');
 			$(xml).find('marker').each(function(){
 				var cabid = $(this).attr('cabid');
@@ -2024,7 +2037,7 @@
 				'clickable': true 
 			});
 			*/
-			$.post('http://www.mytaxiserver.com/appserver/open_app_dcvp_xml.php', {lat: rdvlat, lng: rdvlng, type: typecar, howmany: howMany, cb: cb, pmr: pmr, pet: pet, group: group, dep: dep, zip: zip, pass: 'true'}, function(xml){
+			$.post('https://www.mytaxiserver.com/appserver/open_app_dcvp_xml.php', {lat: rdvlat, lng: rdvlng, type: typecar, howmany: howMany, cb: cb, pmr: pmr, pet: pet, group: group, dep: dep, zip: zip, pass: 'true'}, function(xml){
 				//navigator.notification.alert('IN');
 				$(xml).find('marker').each(function(){
 					var cabid = $(this).attr('cabid');
@@ -2197,7 +2210,7 @@
 		dep = $.sessionStorage.getItem('dep');
 		i = 0; // We need to make any numreq unique on that one !!
 		//$.post("https://www.mytaxiserver.com/appserver/app_dcvp_xml.php", { lat: rdvlat, lng: rdvlng, type: typecar, howmany: howMany, cb: cb, group: '1', dep: '', pass: 'true'}, function(xml){
-		$.post('http://www.mytaxiserver.com/appserver/app_dcvp_xml.php', {lat: rdvlat, lng: rdvlng, type: typecar, howmany: howMany, cb: cb, group: group, dep: dep, zip: zip, insee: insee, pass: 'true'}, function(xml){
+		$.post('https://www.mytaxiserver.com/appserver/app_dcvp_xml.php', {lat: rdvlat, lng: rdvlng, type: typecar, howmany: howMany, cb: cb, group: group, dep: dep, zip: zip, insee: insee, pass: 'true'}, function(xml){
 			$(xml).find('marker').each(function(){
 				var name = $(this).attr('name');
 				var address = $(this).attr('address');
@@ -2313,7 +2326,7 @@
 		dep = $.sessionStorage.getItem('dep');
 		i = 0; // We need to make any numreq unique on that one !!
 		//$.post('https://www.mytaxiserver.com/appserver/app_dcvp_xml.php', {lat: rdvlat, lng: rdvlng, type: typecar, howmany: howMany, cb: cb, group: group, dep: dep, zip: zip, pass: 'true'}, function(xml){
-		$.post('http://www.mytaxiserver.com/appserver/app_dcvp_xml.php', {lat: rdvlat, lng: rdvlng, type: typecar, howmany: howMany, cb: cb, group: group, dep: dep, zip: zip, pass: 'true'}, function(xml){
+		$.post('https://www.mytaxiserver.com/appserver/app_dcvp_xml.php', {lat: rdvlat, lng: rdvlng, type: typecar, howmany: howMany, cb: cb, group: group, dep: dep, zip: zip, pass: 'true'}, function(xml){
 			//navigator.notification.alert('IN');
 			$(xml).find('marker').each(function(){
 				var name = $(this).attr('name');
@@ -2370,7 +2383,7 @@
 		$('.confButtons').hide('fast');
 		$('.whatNext').hide('fast');
 		$('#answerOpen').empty().append('<p><b>Veuillez patienter pendant que nous traitons votre demande aupr&egrave;s du chauffeur ...<button type="button" class="cancel ui-btn ui-btn-b ui-shadow ui-corner-all ui-btn-icon-left ui-icon-delete" id="cancel" onClick="stopCallOpen()" value=""> Retour / Annulation </button></b></p>');
-		$.post("http://www.mytaxiserver.com/appserver/open_diary_app_share.php", url, function(data) {
+		$.post("https://www.mytaxiserver.com/appserver/open_diary_app_share.php", url, function(data) {
 			if(data.reponse_code == '201') {
 				hail_id = data.hail_id;
 				clearInterval(refreshOpenMarkers);
@@ -2410,7 +2423,7 @@
 		if(!stopCheckAnswer) {
 			$.ajax({
 				type: "GET",
-				url: "http://www.mytaxiserver.com/appserver/open_status_json_lp.php?hail_id=" + hail_id + "&dep=" + dep + "&check=1",
+				url: "https://www.mytaxiserver.com/appserver/open_status_json_lp.php?hail_id=" + hail_id + "&dep=" + dep + "&check=1",
 				data: { hail_id: hail_id, dep: dep, check: 1 },
 				dataType: "json",
 				cache: false,
@@ -2467,7 +2480,7 @@
 		//navigator.notification.alert(idcourse);
 		dep = $.sessionStorage.getItem('dep');
 		if(hail_id!='') {
-			$.post("http://www.mytaxiserver.com/appserver/open_diary.php?hail_id=" + hail_id + "&ack=1&db=1&cab_wont=1&del=1&status=declined_by_customer"); 
+			$.post("https://www.mytaxiserver.com/appserver/open_diary.php?hail_id=" + hail_id + "&ack=1&db=1&cab_wont=1&del=1&status=declined_by_customer"); 
 		}
     }        
 	function stopCallOpen()
@@ -2498,7 +2511,7 @@
 		if(!stopCheckAnswer) {
 			$.ajax({
 				type: "GET",
-				url: "http://www.mytaxiserver.com/appserver/status_lp.php?hail_id=" + hail_id + "&dep=" + dep + "&check=1",
+				url: "https://www.mytaxiserver.com/appserver/status_lp.php?hail_id=" + hail_id + "&dep=" + dep + "&check=1",
 				data: { idcourse: idcourse, dep: dep, check: 1 },
 				dataType: "html",
 				cache: false,
@@ -2586,7 +2599,7 @@
 		if(action==1) {
 			// Client Agrees...
 			//$.post("https://www.mytaxiserver.com/appserver/open_diary.php?hail_id=" + hail_id + "&lat=" + lat + "&lng=" + lng + "&ack=1&db=1&cab_wont=0&del=0&status=accepted_by_customer").done(function(data) {
-			$.post("http://www.mytaxiserver.com/appserver/open_diary.php?hail_id=" + hail_id + "&lat=" + lat + "&lng=" + lng + "&cell=" + tel + "&operator=" + operator + "&dep=" + dep + "&ack=1&db=1&cab_wont=0&del=0&status=accepted_by_customer").done(function(data) {
+			$.post("https://www.mytaxiserver.com/appserver/open_diary.php?hail_id=" + hail_id + "&lat=" + lat + "&lng=" + lng + "&cell=" + tel + "&operator=" + operator + "&dep=" + dep + "&ack=1&db=1&cab_wont=0&del=0&status=accepted_by_customer").done(function(data) {
 				//$('.whatNext').empty().append('<p><b>Vous avez accept&eacute; la course, le chauffeur se rend sur place, un mail vous a &eacute;t&eacute; envoy&eacute; et vous allez &ecirc;tre redirig&eacute; vers l&rsquo;accueil.</b></p>');
 				$('#answerOpen').empty().append('<p><b>Le chauffeur va maintenant vous rejoindre, voici les actions disponibles:</b></p>');
 				$('.whatNext').empty().append(data);
@@ -2602,7 +2615,7 @@
 		else {
 			// Client Abort...
 			//$.post("https://www.mytaxiserver.com/appserver/open_diary.php?hail_id=" + hail_id + "&lat=" + lat + "&lng=" + lng + "&ack=1&db=1&cab_wont=1&del=1&status=declined_by_customer").done(function(data) {
-			$.post("http://www.mytaxiserver.com/appserver/open_diary.php?hail_id=" + hail_id + "&lat=" + lat + "&lng=" + lng + "&cell=" + tel + "&operator=" + operator + "&dep=" + dep + "&ack=1&db=1&cab_wont=1&del=1&status=declined_by_customer").done(function(data) {
+			$.post("https://www.mytaxiserver.com/appserver/open_diary.php?hail_id=" + hail_id + "&lat=" + lat + "&lng=" + lng + "&cell=" + tel + "&operator=" + operator + "&dep=" + dep + "&ack=1&db=1&cab_wont=1&del=1&status=declined_by_customer").done(function(data) {
 				$('#answerOpen').empty();
 				$('.whatNext').empty().append('<p><b>Vous avez refus&eacute; la course et allez &ecirc;tre redirig&eacute; vers l&rsquo;accueil.</b></p>');
 				$('.whatNext').show('fast');
@@ -2653,19 +2666,19 @@
 		var destPricesLng;
 		var destPricesLat;
 		if (rdvPrices!='' && destPrices!='') {
-			// Using http://adresse.data.gouv.fr
-			//http://api-adresse.data.gouv.fr/search/?q=8 bd du port&type=street
-			$.get('http://api-adresse.data.gouv.fr/search/', {q: rdvPrices, type: ''}, function(data) {
+			// Using https://adresse.data.gouv.fr
+			//https://api-adresse.data.gouv.fr/search/?q=8 bd du port&type=street
+			$.get('https://api-adresse.data.gouv.fr/search/', {q: rdvPrices, type: ''}, function(data) {
 				rdvPricesLng = data.features[0].geometry.coordinates[0];
 				rdvPricesLat = data.features[0].geometry.coordinates[1];
 			}, "json").done(function(data) { 
-				$.get('http://api-adresse.data.gouv.fr/search/', {q: destPrices, type: ''}, function(data) {
+				$.get('https://api-adresse.data.gouv.fr/search/', {q: destPrices, type: ''}, function(data) {
 					destPricesLng = data.features[0].geometry.coordinates[0];
 					destPricesLat = data.features[0].geometry.coordinates[1];
 				}, "json").done(function(data) { 
 					var devUrl = 'lat=' + rdvPricesLat + '&lng=' + rdvPricesLng + '&lat2=' + destPricesLat + '&lng2=' + destPricesLng + '&rdv=' + rdvPrices + '&dest=' + destPrices + '&dep=' + dep+ '&app=1';
 					//alert(devUrl);
-					$.post("http://www.mytaxiserver.com/appserver/calcdev.php", devUrl, function(data) { 
+					$.post("https://www.mytaxiserver.com/appserver/calcdev.php", devUrl, function(data) { 
 						$('#pricesCont').empty().append(data+'<button onClick="checkZip(\'#map_page_open\')" class="ui-btn ui-btn-c ui-shadow ui-corner-all ui-btn-icon-left ui-icon-action" id="search">Commander maintenant</button>');
 						//$('#pricesPopCont').empty().append(data);
 						//$( "#pricesPop" ).popup( "open", { positionTo: "window" } );
@@ -2725,9 +2738,9 @@
           <!-- 
           <li><a href="#fleet_page" class="ui-btn ui-btn-icon-left ui-icon-eye">Taxis disponibles</a></li>
 		  <li><a href="#" onClick="Share()" class="ui-btn ui-btn-icon-left ui-icon-mail noAppHide"><b>Partager l&rsquo;app</b></a></li>
-		  <li><a href="#" onclick="window.plugins.socialsharing.share('Téléchargez Mon Appli Taxi sur taximedia.fr', null, 'http://www.taximedia.fr/icon_300.png', 'http://www.taximedia.fr/stores.php?app=taxioff')" class="ui-btn ui-btn-icon-left ui-icon-mail noAppHide"><b>Partager l&rsquo;app</b></a></li>
+		  <li><a href="#" onclick="window.plugins.socialsharing.share('Téléchargez Mon Appli Taxi sur taximedia.fr', null, 'https://www.taximedia.fr/icon_300.png', 'https://www.taximedia.fr/stores.php?app=taxioff')" class="ui-btn ui-btn-icon-left ui-icon-mail noAppHide"><b>Partager l&rsquo;app</b></a></li>
 		   -->
- 		  <li><a href="#" onclick="window.plugins.socialsharing.share('Téléchargez Mon Appli Taxi Business sur taximedia.fr', null, null, 'http://www.taximedia.fr/stores.php?app=taxipro')" class="ui-btn ui-btn-icon-left ui-icon-mail noAppHide"><b>Partager l&rsquo;app</b></a></li>
+ 		  <li><a href="#" onclick="window.plugins.socialsharing.share('Téléchargez Mon Appli Taxi Business sur taximedia.fr', null, null, 'https://www.taximedia.fr/stores.php?app=taxipro')" class="ui-btn ui-btn-icon-left ui-icon-mail noAppHide"><b>Partager l&rsquo;app</b></a></li>
           <li><a href="#" onClick="goScan()" data-transition="slide" class="ui-btn ui-btn-icon-left ui-icon-camera noAppHide">Scanner un code</a></li>
         </ul>
         <button class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-power" onClick="dc()">D&eacute;connexion</button>
@@ -2836,7 +2849,7 @@
                 <div id="search-box">
 					<div id="openDep-box">
 						<button onClick="checkZip('#map_page_open')" class="ui-btn ui-btn-c ui-shadow ui-corner-all ui-btn-icon-left ui-icon-search" id="searchOpen">Choisir un taxi</button>
-						<p><a href="#" onClick="openSomeUrl('http://le.taxi/')">La maraude &eacute;lectronique avec Le.Taxi &ccedil;a change quoi ?</a></p>
+						<p><a href="#" onClick="openSomeUrl('https://le.taxi/')">La maraude &eacute;lectronique avec Le.Taxi &ccedil;a change quoi ?</a></p>
 					</div>
 					<!--
 					<div id="tm-box">
@@ -2932,6 +2945,7 @@
 				<br>
 				Veuillez patienter pendant la recherche: <span class="elapsed" style="color:#FC0;"></span> Secondes restantes.
 				<br><br><br>
+				<button class="ui-btn ui-corner-all ui-shadow ui-btn-c ui-btn-icon-left ui-icon-back" onClick="stopCall()"> Retour / Annulation </button>
 				</b></p>
 				<img src="visuels/wifi-1.png" width="64%" id="wifiSteps" class="wifiSteps"/>
 			</div>
@@ -2962,7 +2976,7 @@
 				</div>
 			</div>
         </div>
-        <div data-role="footer" id="footer_map" data-position="fixed" data-fullscreen="true">
+        <div data-role="footer" id="footer_map" style="background:none;" data-position="fixed" data-fullscreen="true">
 			<div id="deliv-hide" style="width: 0px; height: 0px; visibility:hidden;">
 				<input type="button" onClick="" id="deliver" value="" />
 			</div>
@@ -2970,7 +2984,7 @@
 				<div id="dblinks">
 				</div>
 			</div>
-			<p><button type="button" class="cancel ui-btn ui-btn-b ui-shadow ui-corner-all ui-btn-icon-left ui-icon-delete" id="cancel" onClick="stopCall()" value=""> Retour / Annulation </button></p>
+			<!-- <p><button type="button" class="cancel ui-btn ui-btn-b ui-shadow ui-corner-all ui-btn-icon-left ui-icon-delete" id="cancel" onClick="stopCall()" value=""> Retour / Annulation </button></p> -->
         </div>
     </div>
     <div data-role="page" data-theme="c" id="connect">
@@ -2999,6 +3013,7 @@
                 </div>
 				-->
                 <p><a href="#" onClick="openSomeUrl('https://goo.gl/Bz4yK0')">Le.Taxi &ccedil;a marche comment? &Ccedil;a change quoi ?</a></p>
+                <p><a href="#" onClick="openPdf('http://taximedia.fr/client/docs/privacy.policy.pdf', successOpenPdf, errorOpenPdf)">Politique de confidentialit&eacute;</a></p>
                 <div id="fogotReturns"></div>
 				<a href="mailto:info@taximedia.fr" class="ui-btn ui-btn-icon-left ui-icon-mail  ui-shadow-icon ui-corner-all">Nous contacter</a>
            </div>
@@ -3023,6 +3038,7 @@
                 <div id="subReturns"></div>
 				<p>&nbsp;</p>
                 <p><a href="#" onClick="openSomeUrl('https://goo.gl/Bz4yK0')">Le.Taxi &ccedil;a marche comment? &Ccedil;a change quoi ?</a></p>
+                <p><a href="#" onClick="openPdf('http://taximedia.fr/client/docs/privacy.policy.pdf', successOpenPdf, errorOpenPdf)">Politique de confidentialit&eacute;</a></p>
             </div>
         </div>
     </div>
