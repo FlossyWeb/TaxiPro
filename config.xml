@@ -57,9 +57,9 @@
 	<plugin name="cordova-plugin-mauron85-background-geolocation" spec="2.2.5" source="npm">
 		<variable name="ALWAYS_USAGE_DESCRIPTION" value="CELA PERMETTRA AUX TAXIS DE CONNAITRE VOTRE POSITION." />
 	</plugin>
-	<plugin name="cordova-plugin-background-mode" source="npm" spec="0.6.5" />
-	<!-- 
 	<plugin name="cordova-plugin-background-task" source="npm" />
+	<!-- 
+	<plugin name="cordova-plugin-background-mode" source="npm" spec="0.6.5" />
 	<plugin name="de.appplant.cordova.plugin.local-notification" spec="0.8.4" source="npm" />
 	<plugin name="de.appplant.cordova.plugin.local-notification-ios9-fix" spec="0.8.2" />
 	<plugin name="cordova-plugin-crosswalk-webview" source="npm" version="2.3.0" />
