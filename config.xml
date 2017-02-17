@@ -14,7 +14,7 @@
 	   Réservez votre taxi simplement via votre mobile avec l'application Taxi Pro.
 	</description>
 
-    <preference name="phonegap-version" value="cli-6.3.0" />
+    <preference name="phonegap-version" value="cli-6.5.0" />
     <preference name="orientation"      value="default" />
     <preference name="target-device"    value="universal" />
     <preference name="fullscreen"       value="false" />
@@ -22,8 +22,8 @@
 	<preference name="show-splash-screen-spinner" value="false" />
 	<preference name="detect-data-types" value="false" />
 	<preference name="android-build-tool" value="gradle" />
-	<preference name="android-minSdkVersion" value="21" />
-	<preference name="android-targetSdkVersion" value="21" />
+	<preference name="android-minSdkVersion" value="16" />
+	<preference name="android-targetSdkVersion" value="16" />
 
     <plugin name="cordova-plugin-device" source="npm" />
 	<plugin name="cordova-plugin-camera" source="npm" />
@@ -54,7 +54,7 @@
 	<plugin name="cordova-sms-plugin" source="npm" spec="0.1.10" />
 	<plugin name="phonegap-plugin-barcodescanner" source="npm" />
 	<plugin name="cordova-plugin-powermanagement" source="npm" />
-	<plugin name="cordova-plugin-mauron85-background-geolocation" spec="2.2.4" source="npm">
+	<plugin name="cordova-plugin-mauron85-background-geolocation" spec="2.2.5" source="npm">
 		<variable name="ALWAYS_USAGE_DESCRIPTION" value="CELA PERMETTRA AUX TAXIS DE CONNAITRE VOTRE POSITION." />
 	</plugin>
 	<plugin name="cordova-plugin-background-mode" source="npm" spec="0.6.5" />
@@ -65,7 +65,7 @@
 	<plugin name="cordova-plugin-crosswalk-webview" source="npm" version="2.3.0" />
 	-->
     <plugin name="cordova-plugin-local-notifications" spec="https://github.com/notclive/cordova-plugin-local-notifications" source="git" />  
-	<plugin name="cordova-plugin-crosswalk-webview" source="npm" version="1.8.0" />
+	<plugin name="cordova-plugin-crosswalk-webview" source="npm" version="2.3.0" />
     <preference name="xwalkMultipleApk" value="true" />      
     <plugin name="cordova-build-architecture" spec="https://github.com/MBuchalik/cordova-build-architecture.git#v1.0.1" source="git" />  
     <preference name="android-versionCode" value="3104" />
