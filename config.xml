@@ -2,7 +2,7 @@
 <widget xmlns = "http://www.w3.org/ns/widgets"
 		xmlns:gap = "http://phonegap.com/ns/1.0"
 		id = "com.taxibleuservices.mytaxipro"
-		version = "1.5.8">
+		version = "1.5.9">
     
     <author href="http://flossyweb.com" email="contact@flossyweb.com">
         FRANCOIS-REGIS SIMON
@@ -51,7 +51,7 @@
 	<plugin name="cordova-plugin-whitelist" source="npm" spec="1.0.0" />
 	<plugin name="cordova-open" source="npm" spec="1.0.12" />
 	<plugin name="com-badrit-contactpicker" source="npm" />
-	<plugin name="cordova-sms-plugin" source="npm" spec="0.1.10" />
+	<plugin name="cordova-sms-plugin" source="npm" spec="0.1.11" />
 	<plugin name="phonegap-plugin-barcodescanner" source="npm" />
 	<plugin name="cordova-plugin-powermanagement" source="npm" />
 	<plugin name="cordova-plugin-mauron85-background-geolocation" spec="2.2.5" source="npm">
@@ -77,7 +77,7 @@
 	<plugin name="cordova-plugin-customurlscheme" source="npm">
 		<param name="URL_SCHEME" value="montaxipro" />
 	</plugin>
-	<plugin name="cordova-plugin-x-socialsharing" spec="5.0.11" source="npm" />
+	<plugin name="cordova-plugin-x-socialsharing" source="npm" />
 
     <icon src="icon.png" />
 	<splash src="splash.png" />

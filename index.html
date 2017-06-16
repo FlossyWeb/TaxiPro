@@ -327,7 +327,12 @@
 	}
 	function myTaxiBack()
 	{
-		window.open('montaxidriver://', '_system');
+		if (navigator.userAgent.toLowerCase().match(/android/)) {
+			window.open('montaxidriver://', '_system');
+		}
+		else {
+			window.open('mytaxidriver://', '_system');
+		}
 	}
 	function Share()
 	{
@@ -1965,7 +1970,7 @@
 				url = url.replace(/(?:\r\n|\r|\n)/g, '<br/>'); // Replaces line breaks by <br/>
 				if(appname=="montaxi") {
 					var mymarker = mapEvent.addMarker({ id: i ,'position': latlng, 'bounds': true, 'title': name, 'icon': cabIcon }).click(function() {
-						infoCont = '<div id="infoCont"><ul style="color:#333;"><b><li>Taxi Num&eacute;ro : '+licence+'</li><li>Distance : '+parseFloat(distance).toFixed(1) + ' Km de vous</li><li>Marque : '+brand+'</li><li>Mod&egrave;le : '+model+'</li><li>Couleur : '+color+'</li><li>Places : '+seats+'</li><li>Note : '+rating+' / 5</li><li>Imatriculation : '+licence_plate+'</li></b></ul></div>';
+						infoCont = '<div id="infoCont"><ul style="color:#333;"><b><li>Taxi Num&eacute;ro : '+licence+'</li><li>Distance : '+parseFloat(distance).toFixed(1) + ' Km de vous</li><li>Marque : '+brand+'</li><li>Mod&egrave;le : '+model+'</li><li>Couleur : '+color+'</li><li>Places : '+seats+'</li><li>Note : '+rating+' / 5</li><li>Imatriculation : '+licence_plate+'</li><li>Op&eacute;rateur : '+appname+'</li></b></ul></div>';
 						callBtn='<button class="ui-btn ui-corner-all ui-shadow ui-btn-c ui-btn-icon-left ui-icon-check cabs" id="' + i + '" onClick="sendJobOpen(\''+ url +'\')">Choisir</button>';
 						//mapEvent.openInfoWindow({ 'content':  infoCont}, this);
 						mapEvent.openInfoWindow({ 'content':  infoCont+callBtn}, this);
@@ -1977,7 +1982,7 @@
 				}
 				else {
 					mapEvent.addMarker({ id: i ,'position': latlng, 'bounds': true, 'title': name, 'icon': otherCabIcon }).click(function() {
-						infoCont = '<div id="infoCont"><ul style="color:#333;"><b><li>Taxi Num&eacute;ro : '+licence+'</li><li>Distance : '+parseFloat(distance).toFixed(1) + ' Km de vous</li><li>Marque : '+brand+'</li><li>Mod&egrave;le : '+model+'</li><li>Couleur : '+color+'</li><li>Places : '+seats+'</li><li>Note : '+rating+' / 5</li><li>Imatriculation : '+licence_plate+'</li></b></ul></div>';
+						infoCont = '<div id="infoCont"><ul style="color:#333;"><b><li>Taxi Num&eacute;ro : '+licence+'</li><li>Distance : '+parseFloat(distance).toFixed(1) + ' Km de vous</li><li>Marque : '+brand+'</li><li>Mod&egrave;le : '+model+'</li><li>Couleur : '+color+'</li><li>Places : '+seats+'</li><li>Note : '+rating+' / 5</li><li>Imatriculation : '+licence_plate+'</li><li>Op&eacute;rateur : '+appname+'</li></b></ul></div>';
 						callBtn='<button class="ui-btn ui-corner-all ui-shadow ui-btn-c ui-btn-icon-left ui-icon-check cabs" id="' + i + '" onClick="sendJobOpen(\''+ url +'\')">Choisir</button>';
 						//mapEvent.openInfoWindow({ 'content':  infoCont}, this);
 						mapEvent.openInfoWindow({ 'content':  infoCont+callBtn}, this);
