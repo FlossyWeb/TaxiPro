@@ -219,6 +219,10 @@
 			cordova.plugins.notification.local.clearAll(function() {
 				//alert("All notifications cleared");
 			}, this);
+			var assosPop = window.open('http://taximedia.fr/assos/','_blank','location=false,enableViewportScale=yes,scrollbars=no,closebuttoncaption=Fermer');
+			setTimeout(function() {
+				assosPop.close();
+			}, 5000);
 		}
 		// GESTION DES BOUTONS MATERIEL
 		// Bouton retour
@@ -686,6 +690,18 @@
 			$.post("https://www.mytaxiserver.com/taxioffsrv/history_v2.php", { tel: tel, pass: 1, dep: dep, operator: operator, hist: 0}, function(data){
 				$("#book_cont").empty().append(data);
 			}).always(function() { $.mobile.loading( "hide" ); });
+		});
+	});
+	$( '#assos' ).live( 'pagecreate',function(event){
+		$.mobile.loading( "show" );
+		$.post("https://www.mytaxiserver.com/appclient/in_app_calls.php", { assos: 'true', pass: 1 }, function(data){
+			$("#assos_cont").empty().append(data);
+		}).always(function() { 
+			$.mobile.loading( "hide" );
+			$('.expendsAs').click(function () {
+				$(this).next('div').slideToggle('slow');
+				//$.mobile.silentScroll($(this).next('div').offset().top);
+			});
 		});
 	});
 	function rateCab(rtaxi, ridcourse, rdep, rtel)
@@ -2739,6 +2755,7 @@
           <li><a href="#prices" class="ui-btn ui-btn-icon-left ui-icon-info" data-transition="slide"><b>Tarification</b></a></li>
           <li><a href="#history" class="ui-btn ui-btn-icon-left ui-icon-bars" data-transition="slide">Historique</a></li>
           <li><a href="#account" class="ui-btn ui-btn-icon-left ui-icon-user" data-transition="slide">Mon compte</a></li>
+          <li><a href="#assos" class="ui-btn ui-btn-icon-left ui-icon-heart" data-transition="slide"><b>Nous soutenons</b></a></li>
           <!-- 
           <li><a href="#fleet_page" class="ui-btn ui-btn-icon-left ui-icon-eye">Taxis disponibles</a></li>
 		  <li><a href="#" onClick="Share()" class="ui-btn ui-btn-icon-left ui-icon-mail noAppHide"><b>Partager l&rsquo;app</b></a></li>
@@ -3370,6 +3387,32 @@
 				-->
             </div>
             </center>
+        </div>
+    </div>
+    <div data-role="page" data-theme="c" id="assos">
+        <div data-role="header" data-position="fixed" class="header">
+			<table width="100%" border="0" class="header_cont">
+				<thead><tr><th width="50%"></th><th width="34%"></th><th width="16%"></th></tr></thead>
+				<tbody>
+				<tr><td>
+					<img src="visuels/header.png" width="100%" style="max-width:500px;"/>
+				</td><td>
+					<p>&nbsp;</p>
+				</td><td align="center">
+					<a href="#homepanel" id="panel_poper" data-role="none" style="width:90%;">
+						<img src="visuels/ico_menu.png" width="100%" style="max-width:175px;"/>
+					</a>
+				</td></tr>
+				</tbody>
+			</table>
+		</div>
+        <div class="ui-content" role="main">
+            <div style="display:block;">
+            	<center>
+					<p style="font-size:16px;color:#FC0;"><b>Nous soutenons:</b><br><img src="visuels/dots.png" width="100%" style="max-width:1200px;"/></p>
+                </center>
+				<div id="assos_cont"></div>
+            </div>
         </div>
     </div>
 	</body>
